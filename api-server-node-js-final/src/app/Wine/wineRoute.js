@@ -1,7 +1,7 @@
 module.exports = function(app){
-    const user = require('./userController');
+    const wine = require('./wineController');
     const jwtMiddleware = require('../../../config/jwtMiddleware');
 
-    //TODO 로그인 api
+    //TODO 와인 리스트 가져오기 api
 
 };

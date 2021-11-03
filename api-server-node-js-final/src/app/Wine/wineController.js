@@ -1,9 +1,7 @@
 const jwtMiddleware = require("../../../config/jwtMiddleware");
-const userProvider = require("../../app/User/userProvider");
-const userService = require("../../app/User/userService");
+const wineProvider = require("../../app/Wine/wineProvider");
+const wineService = require("../../app/wine/wineService");
 const baseResponse = require("../../../config/baseResponseStatus");
 const {response, errResponse} = require("../../../config/response");
 
-const regexEmail = require("regex-email");
 const {emit} = require("nodemon");
-
