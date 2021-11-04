@@ -9,7 +9,7 @@ module.exports = {
     TOKEN_VERIFICATION_SUCCESS : { "isSuccess": true, "code": 1001, "message":"JWT 토큰 검증 성공" },
 
     //Request error
-
+    WINE_ID_NULL:{ "isSuccess": true, "code": 2001, "message":"검색한 와인 인덱스를 입력해주세요."},
 
     // Response error
 
