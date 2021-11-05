@@ -74,5 +74,5 @@ exports.login=async function(req,res){
 
 exports.autoLogin=async function(req,res){
     const userIdFromJWT=req.verifiedToken.userId;
-    return res.send(response(baseResponse.TOKEN_VERIFICATION_SUCCESS));
+    return res.send(response(baseResponse.TOKEN_VERIFICATION_SUCCESS,{loginUserId:userIdFromJWT}));
 };
