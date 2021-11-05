@@ -44,11 +44,21 @@ exports.selectWineFlavor=async function(connection,wineId){
     return selectWineFlavorQueryRow;
 };
 
+exports.selectPairingFood=async function(connection,wineId){
+    const selectPairingFoodQuery=`
+        SELECT food 
+        From FoodCategory 
+        WHERE foodCategoryId IN (SELECT foodCategoryId FROM FoodPairing WHERE wineId=?);
+    `;
+    const [selectPairingFoodQueryRow]=await connection.query(selectPairingFoodQuery,wineId);
+    return selectPairingFoodQueryRow;
+};
+
 exports.selectWineReviewLimit3=async function(connection,wineId){
     const selectWineReviewLimit3Query=`
         SELECT rating,content,
                (select DATE_FORMAT(createdAt,'%Y.%m.%d')) as createdAt,
-               (select userName from User where userId=Review.userId) as userName
+               (select nickname from User where userId=Review.userId) as userName
         FROM Review
         WHERE wineId=?
         ORDER BY createdAt DESC

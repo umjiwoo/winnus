@@ -43,3 +43,36 @@ exports.postVerification=async function(req,res){
     return res.send(createVerificationRes);
 };
 
+exports.verify=async function(req,res){
+    const {phoneNum,verifyNum}=req.body;
+
+    if(!phoneNum)
+        return res.send(errResponse(baseResponse.ENTER_PHONE_NUMBER_TO_VERIFY));
+    if(!verifyNum)
+        return res.send(errResponse(baseResponse.ENTER_GIVEN_VERIFYING_NUMBER));
+
+    const verifyPhoneNumRes=await userService.postVerification(phoneNum,verifyNum);
+    return res.send(verifyPhoneNumRes);
+};
+
+exports.login=async function(req,res){
+    const {phoneNum,pwd}=req.body; //휴대폰번호,비밀번호로 로그인
+    if(!phoneNum)
+        return res.send(errResponse(baseResponse.ENTER_PHONENUM_TO_SIGN_IN));
+    if(!pwd)
+        return res.send(errResponse(baseResponse.ENTER_PASSWORD_TO_SIGN_IN));
+
+    if(!phoneNum.match(/^[0-9]{3}[0-9]{4}[0-9]{4}$/))
+        return res.send(response(baseResponse.PHONE_REGEX_WRONG));
+
+    if(!regexPwd.test(pwd))
+        return res.send(response(baseResponse.PASSWORD_REGEX_WRONG));
+
+    const signInRes=await userService.postSignIn(phoneNum,pwd);
+    return res.send(signInRes);
+};
+
+exports.autoLogin=async function(req,res){
+    const userIdFromJWT=req.verifiedToken.userId;
+    return res.send(response(baseResponse.TOKEN_VERIFICATION_SUCCESS,{loginUserId:userIdFromJWT}));
+};

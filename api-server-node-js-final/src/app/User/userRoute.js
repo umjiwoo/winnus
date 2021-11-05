@@ -7,6 +7,11 @@ module.exports = function(app){
 
     //휴대폰 문자 인증 api
     app.post('/app/verifications',user.postVerification);
-    //TODO 로그인 api
+    //인증번호 확인 api
+    app.post('/app/verifications/verify',user.verify);
 
+    //로그인 api
+    app.post('/app/login',user.login);
+    //자동 로그인 api
+    app.post('/app/auto-login',jwtMiddleware,user.autoLogin);
 };

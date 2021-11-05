@@ -23,8 +23,11 @@ exports.createUser=async function(nickname,phoneNum,pwd){
 
         //nickname,phoneNum 중복체크
         const phoneNumCheck=await userProvider.phoneNumCheck(phoneNum);
-        if(phoneNumCheck.length>0)
+        if(phoneNumCheck.length>0 && phoneNumCheck[0].status==="REGISTERED")
             return errResponse(baseResponse.ALREADY_SIGN_UP);
+
+        if(phoneNumCheck.length>0 && phoneNumCheck[0].status==="WITHDRAWN")
+            return errResponse(baseResponse.WITHDRAWAL_ACCOUNT);
 
         const nicknameCheck = await userProvider.nicknameCheck(nickname);
         if(nicknameCheck.length>0)
@@ -68,5 +71,61 @@ exports.createVerification = async function (phoneNum) {
     } catch (err) {
         logger.error(`App - createVerification Service error\n: ${err.message}`);
         return errResponse(baseResponse.FAIL_TO_SEND_VERIFICATION_MSG);
+    }
+};
+
+exports.postVerification = async function (phoneNum, verifyNum) {
+    try {
+        const givenPhoneNum = phoneNum;
+        const givenVerifyNum = verifyNum;//인증을 위해 다시 요청한 정보들
+        const existPhoneNum = verifiedPhoneNumArray[0];
+        const existVerifyNum = randomVerificationNumArray[0];//문자 전송 시 저장해놨던 정보들
+
+        if (givenPhoneNum === existPhoneNum && givenVerifyNum === existVerifyNum) {
+            verifiedPhoneNumArray.pop();
+            randomVerificationNumArray.pop();
+            return response(baseResponse.VERIFY_SUCCESS);
+        } else {
+            return errResponse(baseResponse.VERIFY_FAIL);
+        }
+    } catch (err) {
+        logger.error(`App - postVerification Service error\n: ${err.message}`);
+        return errResponse(baseResponse.REQUEST_VERIFY_NUM_FIRST);
+    }
+};
+
+exports.postSignIn=async function(phoneNum,pwd){
+    try{
+        const userCheck=await userProvider.phoneNumCheck(phoneNum);
+        if(userCheck.length<1)
+            return errResponse(baseResponse.USER_NOT_EXIST);
+        if(userCheck[0].status==="WITHDRAWN")
+            return errResponse(baseResponse.WITHDRAWAL_ACCOUNT);
+
+        const hashedPassword = await crypto
+            .createHash("sha512")
+            .update(pwd)
+            .digest("hex");
+
+        const loginUserId=userCheck[0].userId;
+        const passwordCheckRes=await userProvider.passwordCheck(loginUserId);
+
+        if(passwordCheckRes[0].pwd !== hashedPassword)
+            return errResponse(baseResponse.SIGN_IN_PASSWORD_WRONG);
+
+        let token=await jwt.sign(
+            {userId:loginUserId,},
+            secret_config.jwtsecret,
+            {
+                expiresIn:"10d",
+                subject:"User",
+            }
+        );
+
+        return response(baseResponse.SUCCESS,{'userId': loginUserId, 'jwt': token});
+    }
+    catch(err){
+        logger.error(`App - postSignIn Service error\n: ${err.message} \n${JSON.stringify(err)}`);
+        return errResponse(baseResponse.DB_ERROR);
     }
 };
