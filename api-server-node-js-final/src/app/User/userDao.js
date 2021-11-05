@@ -8,10 +8,18 @@ exports.selectUserNickname=async function(connection,nickname){
 
 exports.selectUserPhoneNum=async function(connection,phoneNum){
     const selectUserPhoneNumQuery=`
-        SELECT userId FROM User WHERE phoneNum=?;
+        SELECT userId,status FROM User WHERE phoneNum=?;
     `;
     const [selectUserPhoneNumQueryRow]=await connection.query(selectUserPhoneNumQuery,phoneNum);
     return selectUserPhoneNumQueryRow;
+};
+
+exports.selectUserPassword=async function(connection,userId){
+    const selectUserPasswordQuery=`
+        SELECT pwd FROM User WHERE userId=?;
+    `;
+    const [selectUserPasswordQueryRow]=await connection.query(selectUserPasswordQuery,userId);
+    return selectUserPasswordQueryRow;
 };
 
 exports.insertUser=async function(connection,nickname,phoneNum,pwd){

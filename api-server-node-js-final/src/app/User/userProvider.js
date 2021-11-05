@@ -18,3 +18,10 @@ exports.phoneNumCheck=async function(phoneNum){
     connection.release();
     return phoneNumCheckRes;
 };
+
+exports.passwordCheck=async function(userId){
+    const connection=await pool.getConnection(async (conn) => conn);
+    const passwordCheckRes=await userDao.selectUserPassword(connection,userId);
+    connection.release();
+    return passwordCheckRes;
+};
