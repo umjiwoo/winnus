@@ -76,3 +76,19 @@ exports.autoLogin=async function(req,res){
     const userIdFromJWT=req.verifiedToken.userId;
     return res.send(response(baseResponse.TOKEN_VERIFICATION_SUCCESS,{loginUserId:userIdFromJWT}));
 };
+
+exports.postReview=async function(req,res){
+    const userIdFromJWT=req.verifiedToken.userId;
+    const {wineId,rating,content,tagList}=req.body;
+    if(!wineId)
+        return res.send(errResponse(baseResponse.ENTER_WINE_ID));
+    if(!rating)
+        return res.send(errResponse(baseResponse.RATING_NULL));
+    if(!content)
+        return res.send(errResponse(baseResponse.REVIEW_CONTENT_NULL));
+    if(content.length<20)
+        return res.send(errResponse(baseResponse.REVIEW_CONTENT_LENGTH_WRONG));
+
+    const postReviewRes=await userService.createReview(wineId,userIdFromJWT,rating,content,tagList);
+    return res.send(postReviewRes);
+}

@@ -79,3 +79,11 @@ exports.selectBestWineListByType=async function(connection,wineType,wineId){
     const [selectBestWineListByTypeQueryRow]=await connection.query(selectBestWineListByTypeQuery,[wineType,wineId]);
     return selectBestWineListByTypeQueryRow;
 };
+
+exports.selectWineStatus=async function(connection,wineId){
+    const selectWineStatusQuery=`
+        SELECT status FROM Wine WHERE wineId=?;
+    `;
+    const [selectWineStatusQueryRow]=await connection.query(selectWineStatusQuery,wineId);
+    return selectWineStatusQueryRow;
+};

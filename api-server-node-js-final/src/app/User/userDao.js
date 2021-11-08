@@ -1,3 +1,11 @@
+exports.selectUserStatus=async function(connection,userId){
+    const selectUserStatusQuery=`
+        SELECT status FROM User WHERE userId=?;
+    `;
+    const [selectUserStatusQueryRow]=await connection.query(selectUserStatusQuery,userId);
+    return selectUserStatusQueryRow;
+};
+
 exports.selectUserNickname=async function(connection,nickname){
     const selectUserNicknameQuery=`
         SELECT userId FROM User WHERE nickname=?;
@@ -28,4 +36,20 @@ exports.insertUser=async function(connection,nickname,phoneNum,pwd){
     `;
     const insertUserQueryRow=await connection.query(insertUserQuery,[nickname,phoneNum,pwd]);
     return insertUserQueryRow[0];
+};
+
+exports.insertReview=async function(connection,wineId,userId,rating,content){
+    const insertReviewQuery=`
+        INSERT INTO Review VALUES (null,?,?,?,?,default,default,default);
+    `;
+    const insertReviewQueryRow=await connection.query(insertReviewQuery,[wineId,userId,rating,content]);
+    return insertReviewQueryRow[0];
+};
+
+exports.insertTag=async function(connection,reviewId,userId,tagContent){
+    const insertTagQuery=`
+        INSERT INTO Tag VALUES (null,?,?,?,default,default,default);
+    `;
+    const insertTagQueryRow=await connection.query(insertTagQuery,[reviewId,userId,tagContent]);
+    return insertTagQueryRow;
 };
