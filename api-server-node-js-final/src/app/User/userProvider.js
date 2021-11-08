@@ -25,3 +25,10 @@ exports.passwordCheck=async function(userId){
     connection.release();
     return passwordCheckRes;
 };
+
+exports.userStatusCheck=async function(userId){
+    const connection=await pool.getConnection(async (conn) => conn);
+    const userStatusCheckRes=await userDao.selectUserStatus(connection,userId);
+    connection.release();
+    return userStatusCheckRes;
+};

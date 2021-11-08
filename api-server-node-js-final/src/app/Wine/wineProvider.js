@@ -32,8 +32,15 @@ exports.retrieveWineInfo=async function(wineId){
     //같은 타입 와인 베스트 가져오기
     const wineType=wineInfo[0].typeId;
     const wineListByType=await wineDao.selectBestWineListByType(connection,wineType,wineId);
-    //TODO 비슷한 와인 가져오기
+    //TODO 비슷한 와인 가져오기->당도 산도 바디 타닌 값 같은걸로
 
     connection.release();
     return response(baseResponse.SUCCESS,[{wineInfo:wineInfo}].concat({flavorList:flavor}).concat({pairingFoodList:pairingFood}).concat({reviews:reviews}).concat({bestWineListByType:wineListByType}));
+};
+
+exports.wineCheck=async function(wineId){
+    const connection=await pool.getConnection(async (conn) => conn);
+    const wineStatusCheckRes=await wineDao.selectWineStatus(connection,wineId);
+    connection.release();
+    return wineStatusCheckRes;
 };

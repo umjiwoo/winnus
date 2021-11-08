@@ -4,6 +4,7 @@ module.exports = {
     SUCCESS : { "isSuccess": true, "code": 1000, "message":"성공" },
     SEND_VERIFICATION_MSG_SUCCESS:{"isSuccess": true, "code": 1002, "message":"인증번호 전송 성공" },
     VERIFY_SUCCESS:{"isSuccess": true, "code": 1003, "message":"휴대폰 번호 인증 성공"},
+    POST_REVIEW_SUCCESS:{"isSuccess": true, "code": 1004, "message":"리뷰 작성 성공" },
 
     // Common
     TOKEN_EMPTY : { "isSuccess": false, "code": 2000, "message":"JWT 토큰을 입력해주세요." },
@@ -25,7 +26,8 @@ module.exports = {
     ENTER_PHONENUM_TO_SIGN_IN:{"isSuccess": false, "code": 2011, "message": "로그인 휴대폰 번호를 입력해주세요."},
     ENTER_PASSWORD_TO_SIGN_IN:{ "isSuccess": false, "code": 2012, "message":"로그인 비밀번호를 입력해주세요."},
 
-    WINE_ID_NULL:{ "isSuccess": false, "code": 2030, "message":"검색한 와인 인덱스를 입력해주세요."},
+    WINE_ID_NULL:{ "isSuccess": false, "code": 2030, "message":"검색할 와인 인덱스를 입력해주세요."},
+
 
 
     // Response error
@@ -34,9 +36,17 @@ module.exports = {
     FAIL_TO_SEND_VERIFICATION_MSG:{"isSuccess": false, "code": 3003, "message": "인증 번호 전송에 실패했습니다."},
     VERIFY_FAIL:{"isSuccess": false, "code": 3004, "message": "휴대폰 번호 인증에 실패했습니다. 다시 시도해주세요."},
     REQUEST_VERIFY_NUM_FIRST:{"isSuccess": false, "code": 3005, "message": "발급받은 인증번호가 없습니다."},
-    USER_NOT_EXIST:{"isSuccess": false, "code": 3006, "message": "해당 번호로 가입된 회원이 존재하지 않습니다."},
+    USER_NOT_EXIST:{"isSuccess": false, "code": 3006, "message": "해당하는 회원이 존재하지 않습니다."},
     WITHDRAWAL_ACCOUNT:{"isSuccess": false, "code": 3007, "message": "탈퇴한 회원입니다."},
     SIGN_IN_PASSWORD_WRONG:{"isSuccess": false, "code": 3008, "message": "비밀번호가 일치하지 않습니다."},
+
+
+    ENTER_WINE_ID:{"isSuccess": false, "code": 3030, "message": "리뷰를 작성할 와인 인덱스를 입력해주세요."},
+    RATING_NULL:{"isSuccess": false, "code": 3031, "message":"별점을 입력해주세요."},
+    REVIEW_CONTENT_NULL:{"isSuccess": false, "code": 3032, "message":"리뷰 내용을 입력해주세요."},
+    REVIEW_CONTENT_LENGTH_WRONG:{"isSuccess": false, "code": 3033, "message":"리뷰는 최소 20자 이상 작성해주세요."},
+
+    WINE_NOT_EXIST:{"isSuccess": false, "code": 3040, "message":"존재하지 않는 와인 인덱스입니다."},
 
     //Connection, Transaction 등의 서버 오류
     DB_ERROR : { "isSuccess": false, "code": 4000, "message": "데이터 베이스 에러"},

@@ -14,4 +14,8 @@ module.exports = function(app){
     app.post('/app/login',user.login);
     //자동 로그인 api
     app.post('/app/auto-login',jwtMiddleware,user.autoLogin);
+
+    //리뷰 작성
+    app.post('/app/reviews',jwtMiddleware,user.postReview);
+
 };
