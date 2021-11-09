@@ -25,3 +25,11 @@ exports.getWineInfo=async function(req,res){
     const wineInfo=await wineProvider.retrieveWineInfo(wineId);
     return res.send(wineInfo);
 };
+
+exports.getWineReviews=async function(req,res){
+    const wineId=req.params.wineId;
+    if(!wineId)
+        return res.send(errResponse(baseResponse.WINE_ID_NULL));
+    const reviewList=await wineProvider.retrieveWineReviews(wineId);
+    return res.send(reviewList);
+};

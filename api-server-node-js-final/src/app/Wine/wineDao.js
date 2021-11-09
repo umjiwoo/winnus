@@ -18,14 +18,13 @@ exports.selectWineListByType=async function(connection,type){
 
 exports.selectWineInfo=async function(connection,wineId){
     const selectWineInfoQuery=`
-        SELECT wineImg,wineName,region,quantity,productionYear,price,
+        SELECT wineImg,wineName,inEnglish,country,region,quantity,productionYear,price,
             sweetness,acidity,body,tannin,
             taste,
             Wine.type as typeId,
             (select type from TypeCategory where typeId=Wine.type) as type,
-            (select purpose from PurposeCategory where purposeId=Wine.purpose) as purpose,
             variety,
-            (select avg(rating) from Review where wineId=Wine.wineId) as rating,
+            (select ROUND(avg(rating),2) from Review where wineId=Wine.wineId) as rating,
             (select count(reviewId) from Review where wineId=Wine.wineId) as reviewNum
         FROM Wine
         WHERE wineId=?;
@@ -56,7 +55,8 @@ exports.selectPairingFood=async function(connection,wineId){
 
 exports.selectWineReviewLimit3=async function(connection,wineId){
     const selectWineReviewLimit3Query=`
-        SELECT rating,content,
+        SELECT 
+               rating,content,
                (select DATE_FORMAT(createdAt,'%Y.%m.%d')) as createdAt,
                (select nickname from User where userId=Review.userId) as userName
         FROM Review
@@ -86,4 +86,18 @@ exports.selectWineStatus=async function(connection,wineId){
     `;
     const [selectWineStatusQueryRow]=await connection.query(selectWineStatusQuery,wineId);
     return selectWineStatusQueryRow;
+};
+
+exports.selectWineReviews=async function(connection,wineId){
+    const selectWineReviewsQuery=`
+        SELECT
+            rating,content,
+            (select DATE_FORMAT(createdAt,'%Y.%m.%d')) as createdAt,
+            (select nickname from User where userId=Review.userId) as userName
+        FROM Review
+        WHERE wineId=?
+        ORDER BY createdAt DESC;
+    `;
+    const [selectWineReviewsQueryRow]=await connection.query(selectWineReviewsQuery,wineId);
+    return selectWineReviewsQueryRow;
 };

@@ -44,3 +44,14 @@ exports.wineCheck=async function(wineId){
     connection.release();
     return wineStatusCheckRes;
 };
+
+exports.retrieveWineReviews=async function(wineId){
+    const connection=await pool.getConnection(async (conn) => conn);
+    const wineStatusCheckRes=await wineDao.selectWineStatus(connection,wineId);
+    if(wineStatusCheckRes.length<1 || wineStatusCheckRes[0].status==="DELETED")
+        return errResponse(baseResponse.WINE_NOT_EXIST);
+
+    const retrieveWineReviewsRes=await wineDao.selectWineReviews(connection,wineId);
+    connection.release();
+    return response(baseResponse.SUCCESS,{wineReviews:retrieveWineReviewsRes});
+};
