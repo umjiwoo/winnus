@@ -28,7 +28,6 @@ exports.retrieveTodayWineList=async function(){
     const connection=await pool.getConnection(async (conn) => conn);
     //전체 와인 수 조회
     const wineNum=await wineDao.selectWineCount(connection);
-    console.log(wineNum);
     //와인 인덱스값 내에서 랜덤하게 번호 추출-6개
     const wineIdxList=[];
     while(wineIdxList.length<6){
@@ -45,7 +44,7 @@ exports.retrieveTodayWineList=async function(){
         console.log(wineRes);
         todayWineList.push(wineRes);
     }
-    console.log(todayWineList);
+    console.log("오늘의 와인 조회 결과",todayWineList);
     connection.release();
     return response(baseResponse.SUCCESS,{todayWines:todayWineList});
 };
