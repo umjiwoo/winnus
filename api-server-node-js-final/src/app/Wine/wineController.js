@@ -33,3 +33,8 @@ exports.getWineReviews=async function(req,res){
     const reviewList=await wineProvider.retrieveWineReviews(wineId);
     return res.send(reviewList);
 };
+
+exports.getTodayWineList=async function(req,res){
+    const todayWines=await wineProvider.retrieveTodayWineList();
+    return res.send(todayWines);
+};
