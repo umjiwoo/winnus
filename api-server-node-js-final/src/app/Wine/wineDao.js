@@ -1,6 +1,6 @@
 exports.selectWineList=async function(connection){
     const selectWineListQuery=`
-        SELECT wineId,wineImg,wineName,price FROM Wine ORDER BY clickCount;
+        SELECT wineId,wineImg,wineName,price FROM Wine ORDER BY clickCount LIMIT 18;
     `;
     const [selectWineListQueryRow]=await connection.query(selectWineListQuery);
     return selectWineListQueryRow;
@@ -10,7 +10,8 @@ exports.selectWineListByType=async function(connection,type){
     const selectWineListByTypeQuery=`
         SELECT wineId,wineImg,wineName,price FROM Wine
         WHERE type=?
-        ORDER BY clickCount;
+        ORDER BY clickCount
+        LIMIT 18;
     `;
     const [selectWineListByTypeQueryRow]=await connection.query(selectWineListByTypeQuery,type);
     return selectWineListByTypeQueryRow;
