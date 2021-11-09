@@ -74,10 +74,22 @@ exports.selectBestWineListByType=async function(connection,wineType,wineId){
         FROM Wine
         WHERE type=?
         NOT IN (?)
-        ORDER BY clickCount;
+        ORDER BY clickCount
+        LIMIT 4;
     `;
     const [selectBestWineListByTypeQueryRow]=await connection.query(selectBestWineListByTypeQuery,[wineType,wineId]);
     return selectBestWineListByTypeQueryRow;
+};
+
+exports.selectSimilarWineList=async function(connection,sweetness,acidity,body,tannin,wineId){
+    const selectSimilarWineListQuery=`
+        SELECT wineId,wineImg,wineName,price
+        FROM Wine
+        WHERE sweetness=? AND acidity=? AND body=? AND tannin=?
+        NOT IN (?);
+    `;
+    const [selectSimilarWineListQueryRow]=await connection.query(selectSimilarWineListQuery,[sweetness,acidity,body,tannin,wineId]);
+    return selectSimilarWineListQueryRow;
 };
 
 exports.selectWineStatus=async function(connection,wineId){
