@@ -1,9 +1,25 @@
+exports.selectWineCount=async function(connection){
+    const selectWineCountQuery=`
+        SELECT count(wineId) as wineNum FROM Wine;
+    `;
+    const [selectWineCountQueryRow]=await connection.query(selectWineCountQuery);
+    return selectWineCountQueryRow;
+};
+
 exports.selectWineList=async function(connection){
     const selectWineListQuery=`
         SELECT wineId,wineImg,wineName,price FROM Wine ORDER BY clickCount LIMIT 18;
     `;
     const [selectWineListQueryRow]=await connection.query(selectWineListQuery);
     return selectWineListQueryRow;
+};
+
+exports.selectTodayWines=async function(connection,wineIdx){
+    const selectTodayWinesQuery=`
+        SELECT wineId,wineImg,wineName,price FROM Wine WHERE wineId=?;
+    `;
+    const [selectTodayWinesQueryRow]=await connection.query(selectTodayWinesQuery,wineIdx);
+    return selectTodayWinesQueryRow;
 };
 
 exports.selectWineListByType=async function(connection,type){
