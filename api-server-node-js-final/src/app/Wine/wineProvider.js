@@ -96,3 +96,31 @@ exports.retrieveWineReviews=async function(wineId){
     connection.release();
     return response(baseResponse.SUCCESS,{wineReviews:retrieveWineReviewsRes});
 };
+
+exports.retrieveWineListByTheme=async function(theme){
+    const connection=await pool.getConnection(async (conn) => conn);
+    if(theme==="floral"){
+        const floralWineList=await wineDao.selectFloralWines(connection);
+        if(floralWineList.length<1)
+            return errResponse(baseResponse.WINE_NOT_EXIST_FOR_THIS_THEME);
+        console.log("플로럴 아로마 와인 리스트\n",floralWineList);
+        connection.release();
+        return response(baseResponse.SUCCESS,{floralWines:floralWineList});
+    }
+    if(theme==="homeParty"){
+        const homePartyWineList=await wineDao.selectWinesForHomeParty(connection);
+        if(homePartyWineList.length<1)
+            return errResponse(baseResponse.WINE_NOT_EXIST_FOR_THIS_THEME);
+        console.log("홈파티를 위한 와인 리스트\n",homePartyWineList);
+        connection.release();
+        return response(baseResponse.SUCCESS,{winesForHomeParty:homePartyWineList});
+    }
+    if(theme==="autumn"){
+        const wineListForAutumn=await wineDao.selectWinesForAutumn(connection);
+        if(wineListForAutumn.length<1)
+            return errResponse(baseResponse.WINE_NOT_EXIST_FOR_THIS_THEME);
+        console.log("가을에 어울리는 와인 리스트\n",wineListForAutumn);
+        connection.release();
+        return response(baseResponse.SUCCESS,{winesForAutumn:wineListForAutumn});
+    }
+};

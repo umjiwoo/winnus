@@ -28,7 +28,7 @@ module.exports = {
 
     WINE_ID_NULL:{ "isSuccess": false, "code": 2030, "message":"검색할 와인 인덱스를 입력해주세요."},
 
-
+    SELECT_THEME_TO_GET:{ "isSuccess": false, "code": 2031, "message":"조회할 테마를 선택해주세요."},
 
     // Response error
     ALREADY_SIGN_UP:{"isSuccess": false, "code": 3001, "message":"이미 가입되어 있는 전화번호입니다."},
@@ -47,6 +47,8 @@ module.exports = {
     REVIEW_CONTENT_LENGTH_WRONG:{"isSuccess": false, "code": 3033, "message":"리뷰는 최소 20자 이상 작성해주세요."},
 
     WINE_NOT_EXIST:{"isSuccess": false, "code": 3040, "message":"존재하지 않는 와인 인덱스입니다."},
+    WINE_NOT_EXIST_FOR_THIS_THEME:{"isSuccess": false, "code": 3041, "message":"해당 테마의 와인이 존재하지 않습니다."},
+
 
     //Connection, Transaction 등의 서버 오류
     DB_ERROR : { "isSuccess": false, "code": 4000, "message": "데이터 베이스 에러"},

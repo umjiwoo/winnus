@@ -38,3 +38,11 @@ exports.getTodayWineList=async function(req,res){
     const todayWines=await wineProvider.retrieveTodayWineList();
     return res.send(todayWines);
 };
+
+exports.getWineListByTheme=async function(req,res){
+    const theme=req.query.theme;
+    if(!theme)
+        return res.send(errResponse(baseResponse.SELECT_THEME_TO_GET));
+    const wineListByThemeRes=await wineProvider.retrieveWineListByTheme(theme);
+    return res.send(wineListByThemeRes);
+}
