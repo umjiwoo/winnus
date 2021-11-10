@@ -15,4 +15,10 @@ module.exports = function(app){
 
     //와인 리뷰 조회 api
     app.get('/app/reviews/:wineId',jwtMiddleware,wine.getWineReviews);
+
+    //일부 키워드로 와인 이름 조회 api
+    app.get('/app/wineNames',jwtMiddleware,wine.getWineNames);
+
+    //와인 이름 검색 api
+    app.get('/app/wines',jwtMiddleware,wine.getWineByName);
 };
