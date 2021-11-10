@@ -105,7 +105,7 @@ exports.retrieveWineListByTheme=async function(theme){
             return errResponse(baseResponse.WINE_NOT_EXIST_FOR_THIS_THEME);
         console.log("플로럴 아로마 와인 리스트\n",floralWineList);
         connection.release();
-        return response(baseResponse.SUCCESS,{floralWines:floralWineList});
+        return response(baseResponse.SUCCESS,{themeWineList:floralWineList});
     }
     if(theme==="homeParty"){
         const homePartyWineList=await wineDao.selectWinesForHomeParty(connection);
@@ -113,7 +113,7 @@ exports.retrieveWineListByTheme=async function(theme){
             return errResponse(baseResponse.WINE_NOT_EXIST_FOR_THIS_THEME);
         console.log("홈파티를 위한 와인 리스트\n",homePartyWineList);
         connection.release();
-        return response(baseResponse.SUCCESS,{winesForHomeParty:homePartyWineList});
+        return response(baseResponse.SUCCESS,{themeWineList:homePartyWineList});
     }
     if(theme==="autumn"){
         const wineListForAutumn=await wineDao.selectWinesForAutumn(connection);
@@ -121,7 +121,7 @@ exports.retrieveWineListByTheme=async function(theme){
             return errResponse(baseResponse.WINE_NOT_EXIST_FOR_THIS_THEME);
         console.log("가을에 어울리는 와인 리스트\n",wineListForAutumn);
         connection.release();
-        return response(baseResponse.SUCCESS,{winesForAutumn:wineListForAutumn});
+        return response(baseResponse.SUCCESS,{themeWineList:wineListForAutumn});
     }
 };
 
