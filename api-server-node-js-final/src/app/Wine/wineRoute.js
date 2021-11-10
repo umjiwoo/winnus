@@ -8,6 +8,7 @@ module.exports = function(app){
     app.get('/app/wines/today',jwtMiddleware,wine.getTodayWineList);
 
     //테마별 와인 리스트 가져오기 api
+    app.get('/app/wines/theme',jwtMiddleware,wine.getWineListByTheme);
 
     //와인 상세 페이지 api
     app.get('/app/wines/:wineId',jwtMiddleware,wine.getWineInfo);

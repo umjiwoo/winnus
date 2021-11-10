@@ -130,3 +130,34 @@ exports.selectWineReviews=async function(connection,wineId){
     const [selectWineReviewsQueryRow]=await connection.query(selectWineReviewsQuery,wineId);
     return selectWineReviewsQueryRow;
 };
+
+
+exports.selectFloralWines=async function(connection){
+    const selectFloralWinesQuery=`
+        SELECT wineId,wineImg,wineName,price
+        FROM Wine
+        WHERE wineId IN (SELECT wineId FROM Flavor WHERE subCategoryId IN (SELECT subCategoryId FROM SubFlavorCategory WHERE mainCategoryId=1));
+    `;
+    const [selectFloralWinesQueryRow]=await connection.query(selectFloralWinesQuery);
+    return selectFloralWinesQueryRow;
+};
+
+exports.selectWinesForHomeParty=async function(connection){
+    const selectWinesForHomePartyQuery=`
+        SELECT wineId,wineImg,wineName,price
+        FROM Wine
+        WHERE type=4 AND 10000<=price<20000 AND sweetness=1;
+    `;
+    const [selectWinesForHomePartyQueryRow]=await connection.query(selectWinesForHomePartyQuery);
+    return selectWinesForHomePartyQueryRow;
+};
+
+exports.selectWinesForAutumn=async function(connection){
+    const selectWinesForAutumnQuery=`
+        SELECT wineId,wineImg,wineName,price
+        FROM Wine
+        WHERE (variety like "%샤르도네%" or "%피노누아%") or type=4;
+    `;
+    const [selectWinesForAutumnQueryRow]=await connection.query(selectWinesForAutumnQuery);
+    return selectWinesForAutumnQueryRow;
+};
