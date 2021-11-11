@@ -5,6 +5,8 @@ module.exports = {
     SEND_VERIFICATION_MSG_SUCCESS:{"isSuccess": true, "code": 1002, "message":"인증번호 전송 성공" },
     VERIFY_SUCCESS:{"isSuccess": true, "code": 1003, "message":"휴대폰 번호 인증 성공"},
     POST_REVIEW_SUCCESS:{"isSuccess": true, "code": 1004, "message":"리뷰 작성 성공" },
+    SUBSCRIBE_SUCCESS:{"isSuccess": true, "code": 1005, "message":"와인 찜 등록 성공" },
+    UNSUBSCRIBE_SUCCESS:{"isSuccess": true, "code": 1005, "message":"와인 찜 해제 성공" },
 
     // Common
     TOKEN_EMPTY : { "isSuccess": false, "code": 2000, "message":"JWT 토큰을 입력해주세요." },
@@ -32,6 +34,8 @@ module.exports = {
 
     ENTER_WINE_NAME:{"isSuccess": false, "code": 2032, "message":"검색할 와인 이름을 입력해주세요."},
     ENTER_WINE_SEARCH_KEYWORD:{"isSuccess": false, "code": 2032, "message":"검색 키워드를 입력해주세요"},
+
+    ENTER_WILLING_TO_SUBSCRIBE_WINE_ID:{ "isSuccess": false, "code": 2033, "message":"찜할 와인 인덱스를 입력해주세요."},
 
 
     // Response error

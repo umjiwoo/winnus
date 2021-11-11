@@ -3,6 +3,9 @@ const { logger } = require("../../../config/winston");
 
 const userDao = require("./userDao");
 
+const {response,errResponse} = require("../../../config/response");
+const baseResponse = require("../../../config/baseResponseStatus");
+
 // Provider: Read 비즈니스 로직 처리
 
 exports.nicknameCheck=async function(nickname){
@@ -31,4 +34,12 @@ exports.userStatusCheck=async function(userId){
     const userStatusCheckRes=await userDao.selectUserStatus(connection,userId);
     connection.release();
     return userStatusCheckRes;
+};
+
+exports.retrieveUserSubscribeList=async function(userId){
+    const connection=await pool.getConnection(async (conn) => conn);
+    const subscribeCount=await userDao.selectSubscribeCount(connection,userId);
+    const userSubscribeList=await userDao.selectUserSubscribeList(connection,userId);
+    connection.release();
+    return response(baseResponse.SUCCESS,subscribeCount.concat({subscribeList:userSubscribeList}));
 };

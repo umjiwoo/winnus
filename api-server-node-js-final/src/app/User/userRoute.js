@@ -18,4 +18,9 @@ module.exports = function(app){
     //리뷰 작성
     app.post('/app/reviews',jwtMiddleware,user.postReview);
 
+    //와인 찜 등록
+    app.post('/app/subscribes',jwtMiddleware,user.postSubscribe);
+
+    //와인 찜 조회
+    app.get('/app/subscribes',jwtMiddleware,user.getUserSubscribeList);
 };

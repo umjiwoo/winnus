@@ -166,3 +166,44 @@ exports.createReview = async function (wineId, userId, rating, content, tagList)
         connection.release();
     }
 };
+
+exports.createSubscribe=async function(userId,wineId){
+    try {
+        const connection = await pool.getConnection(async (conn) => conn);
+        //찜하려는 와인 있는지 확인
+        const wineCheckRes=await wineProvider.wineCheck(wineId);
+        if(wineCheckRes.length<1 || wineCheckRes[0].status==="DELETED")
+            return errResponse(baseResponse.WINE_NOT_EXIST);
+
+        //이미 찜 되어있는지 확인
+        const subscribeCheckRes=await userDao.selectUserSubscribeCheck(connection,userId,wineId);
+        if(subscribeCheckRes.length<1){ //아예 구독이 되어있지 않은 경우
+            const postSubscribeRes=await userDao.insertSubscribe(connection,userId,wineId);
+            connection.release();
+            return response(baseResponse.SUBSCRIBE_SUCCESS);
+        }
+        else{
+            //status확인
+            //status="Y"이면 다시 "N"으로 업데이트 해주기
+            if(subscribeCheckRes[0].status==="Y"){ //찜 해제
+                const status="N";
+                const subscribeId=subscribeCheckRes[0].subscribeId;
+                const updateSubscribeStatusRes=await userDao.updateSubscribeStatus(connection,subscribeId,status);
+                connection.release();
+                return response(baseResponse.UNSUBSCRIBE_SUCCESS);
+            }
+            //status="N"이면 다시 "Y"으로 업데이트 해주기
+            if(subscribeCheckRes[0].status==="N"){ //다시 찜 등록
+                const status="Y";
+                const subscribeId=subscribeCheckRes[0].subscribeId;
+                const updateSubscribeStatusRes=await userDao.updateSubscribeStatus(connection,subscribeId,status);
+                connection.release();
+                return response(baseResponse.SUBSCRIBE_SUCCESS);
+            }
+        }
+    }
+    catch(err){
+        logger.error(`App - postSubscribe Service error\n: ${err.message} \n${JSON.stringify(err)}`);
+        return errResponse(baseResponse.DB_ERROR);
+    }
+};
