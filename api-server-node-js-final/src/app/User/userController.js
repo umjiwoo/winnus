@@ -101,3 +101,9 @@ exports.postSubscribe=async function(req,res){
     const postSubscribeRes=await userService.createSubscribe(userIdFromJWT,wineId);
     return res.send(postSubscribeRes);
 };
+
+exports.getUserSubscribeList=async function(req,res){
+    const userIdFromJWT=req.verifiedToken.userId;
+    const userSubscribeListRes=await userProvider.retrieveUserSubscribeList(userIdFromJWT);
+    return res.send(userSubscribeListRes);
+};

@@ -77,3 +77,23 @@ exports.updateSubscribeStatus=async function(connection,subscribeId,status){
     const updateSubscribeStatusQueryRow=await connection.query(updateSubscribeStatusQuery,[status,subscribeId]);
     return updateSubscribeStatusQueryRow;
 };
+
+exports.selectSubscribeCount=async function(connection,userId){
+    const selectSubscribeCountQuery=`
+        SELECT count(subscribeId) as subscribeNum FROM Subscribe WHERE userId=?;
+    `;
+    const [selectSubscribeCountQueryRow]=await connection.query(selectSubscribeCountQuery,userId);
+    return selectSubscribeCountQueryRow;
+};
+
+exports.selectUserSubscribeList=async function(connection,userId){
+    const selectUserSubscribeListQuery=`
+        SELECT wineId,wineImg,wineName,country,region,quantity,price,
+               (select count(subscribeId) from Subscribe where wineId=Wine.wineId and status="Y") as subscribeCount,
+               (select count(reviewId) from Review where wineId=Wine.wineId) as reviewCount
+        FROM Wine
+        WHERE wineId IN (select wineId from Subscribe where userId=? and status="Y");
+    `;
+    const [selectUserSubscribeListQueryRow]=await connection.query(selectUserSubscribeListQuery,userId);
+    return selectUserSubscribeListQueryRow;
+};

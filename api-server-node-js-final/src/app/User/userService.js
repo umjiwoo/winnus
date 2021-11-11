@@ -189,6 +189,7 @@ exports.createSubscribe=async function(userId,wineId){
                 const status="N";
                 const subscribeId=subscribeCheckRes[0].subscribeId;
                 const updateSubscribeStatusRes=await userDao.updateSubscribeStatus(connection,subscribeId,status);
+                connection.release();
                 return response(baseResponse.UNSUBSCRIBE_SUCCESS);
             }
             //status="N"이면 다시 "Y"으로 업데이트 해주기
@@ -196,6 +197,7 @@ exports.createSubscribe=async function(userId,wineId){
                 const status="Y";
                 const subscribeId=subscribeCheckRes[0].subscribeId;
                 const updateSubscribeStatusRes=await userDao.updateSubscribeStatus(connection,subscribeId,status);
+                connection.release();
                 return response(baseResponse.SUBSCRIBE_SUCCESS);
             }
         }

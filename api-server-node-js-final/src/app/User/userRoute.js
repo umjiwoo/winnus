@@ -21,4 +21,6 @@ module.exports = function(app){
     //와인 찜 등록
     app.post('/app/subscribes',jwtMiddleware,user.postSubscribe);
 
+    //와인 찜 조회
+    app.get('/app/subscribes',jwtMiddleware,user.getUserSubscribeList);
 };
