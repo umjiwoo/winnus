@@ -91,4 +91,13 @@ exports.postReview=async function(req,res){
 
     const postReviewRes=await userService.createReview(wineId,userIdFromJWT,rating,content,tagList);
     return res.send(postReviewRes);
-}
+};
+
+exports.postSubscribe=async function(req,res){
+    const userIdFromJWT=req.verifiedToken.userId;
+    const wineId=req.body.wineId;
+    if(!wineId)
+        return res.send(errResponse(baseResponse.ENTER_WILLING_TO_SUBSCRIBE_WINE_ID));
+    const postSubscribeRes=await userService.createSubscribe(userIdFromJWT,wineId);
+    return res.send(postSubscribeRes);
+};

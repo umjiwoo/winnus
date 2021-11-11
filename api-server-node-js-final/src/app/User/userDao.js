@@ -53,3 +53,27 @@ exports.insertTag=async function(connection,reviewId,userId,tagContent){
     const insertTagQueryRow=await connection.query(insertTagQuery,[reviewId,userId,tagContent]);
     return insertTagQueryRow;
 };
+
+exports.selectUserSubscribeCheck=async function(connection,userId,wineId){
+    const selectUserSubscribeCheckQuery=`
+        SELECT subscribeId,status FROM Subscribe WHERE userId=? AND wineId=?;
+    `;
+    const [selectUserSubscribeCheckQueryRow]=await connection.query(selectUserSubscribeCheckQuery,[userId,wineId]);
+    return selectUserSubscribeCheckQueryRow;
+};
+
+exports.insertSubscribe=async function(connection,userId,wineId){
+    const insertSubscribeQuery=`
+        INSERT INTO Subscribe VALUES (null,?,?,default,default,default);
+    `;
+    const insertSubscribeQueryRow=await connection.query(insertSubscribeQuery,[userId,wineId]);
+    return insertSubscribeQueryRow;
+};
+
+exports.updateSubscribeStatus=async function(connection,subscribeId,status){
+    const updateSubscribeStatusQuery=`
+        UPDATE Subscribe SET status=? WHERE subscribeId=?;
+    `;
+    const updateSubscribeStatusQueryRow=await connection.query(updateSubscribeStatusQuery,[status,subscribeId]);
+    return updateSubscribeStatusQueryRow;
+};

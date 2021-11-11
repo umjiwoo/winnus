@@ -188,7 +188,7 @@ exports.selectWineByName=async function(connection,userId,wineName){
                        THEN status
                    ELSE "N"
                    END AS userSubscribeStatus,
-               (select count(subscribeId) from Subscribe where wineId=Wine.wineId) as subscribeCount,
+               (select count(subscribeId) from Subscribe where wineId=Wine.wineId and status="Y") as subscribeCount,
                (select count(reviewId) from Review where wineId=Wine.wineId) as reviewCount
         FROM Wine
         WHERE wineName=?;
