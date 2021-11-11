@@ -5,6 +5,7 @@ const wineDao = require("./wineDao");
 
 const {response, errResponse} = require("../../../config/response");
 const baseResponse = require("../../../config/baseResponseStatus");
+const {integer} = require("twilio/lib/base/deserialize");
 
 
 // Provider: Read 비즈니스 로직 처리
@@ -175,4 +176,19 @@ exports.retrieveWineByName = async function (userId, keyword) {
 
     connection.release();
     return response(baseResponse.SUCCESS, [{wineCount: getWineNum}].concat({retrieveWineRes: retrieveWineRes}));
+};
+
+exports.retrieveWinesByFilter=async function(userId,type,taste,flavors,foods,price){
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const tasteList=taste.split(',');
+    console.log(tasteList);
+    const sweetness=integer(tasteList[0]);
+    const acidity=integer(tasteList[1]);
+    const body=integer(tasteList[2]);
+    const tannin=integer(tasteList[3]);
+
+    const secondFilteringRes=await wineDao.selectWineListByTaste(connection,userId,type,sweetness,acidity,body,tannin);
+    connection.release();
+    return response(baseResponse.SUCCESS,secondFilteringRes);
 };
