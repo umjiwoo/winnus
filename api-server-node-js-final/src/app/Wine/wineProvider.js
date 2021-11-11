@@ -151,12 +151,28 @@ exports.retrieveWineNamesByKeyword = async function (keyword) {
     return response(baseResponse.SUCCESS, {wineNames: wineNamesRes});
 };
 
-exports.retrieveWineByName = async function (userId, wineName) {
+exports.retrieveWineByName = async function (userId, keyword) {
     const connection = await pool.getConnection(async (conn) => conn);
-    const getWineNum = await wineDao.selectWineCountByName(connection, wineName);
-    const retrieveWineRes = await wineDao.selectWineByName(connection, userId, wineName);
+
+    const keywordSplitList = keyword.split("");
+    const repeatNum = keywordSplitList.length;
+    //문자 사이사이 와일드카드 삽입
+    for (let i = 0; i < repeatNum; i++) {
+        keywordSplitList.splice(i * 2, 0, "%");
+    }
+    //맨 마지막에 와일드카드 추가해주기
+    keywordSplitList.push("%");
+    //배열 문자열로 합치기
+    //여기서 join.("%")했어도 됨
+    keyword = keywordSplitList.join("");
+
+    const getWineNum = await wineDao.selectWineCountByName(connection, keyword);
+    const retrieveWineRes = await wineDao.selectWineByName(connection, userId, keyword);
     if (retrieveWineRes.length < 1)
-        return errResponse(baseResponse.WINE_NOT_EXIST_FOR_THIS_NAME);
+        return errResponse(baseResponse.WINE_NOT_EXIST_FOR_THIS_KEYWORD);
+
+    console.log("키워드로 와인 검색\n",retrieveWineRes);
+
     connection.release();
     return response(baseResponse.SUCCESS, [{wineCount: getWineNum}].concat({retrieveWineRes: retrieveWineRes}));
 };

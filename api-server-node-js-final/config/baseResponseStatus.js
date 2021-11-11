@@ -56,7 +56,7 @@ module.exports = {
 
     WINE_NOT_EXIST:{"isSuccess": false, "code": 3040, "message":"존재하지 않는 와인 인덱스입니다."},
     WINE_NOT_EXIST_FOR_THIS_THEME:{"isSuccess": false, "code": 3041, "message":"해당 테마의 와인이 존재하지 않습니다."},
-    WINE_NOT_EXIST_FOR_THIS_NAME:{"isSuccess": false, "code": 3042, "message":"해당 이름의 와인이 존재하지 않습니다."},
+    WINE_NOT_EXIST_FOR_THIS_KEYWORD:{"isSuccess": false, "code": 3042, "message":"해당 키워드의 검색결과가 존재하지 않습니다."},
     WINE_NOT_EXIST_INCLUDE_THIS_KEYWORD:{"isSuccess": false, "code": 3043, "message":"해당 키워드를 포함하는 와인이 존재하지 않습니다."},
 
     WRONG_THEME:{"isSuccess": false, "code": 3044, "message":"테마명을 정확히 입력해주세요."},
