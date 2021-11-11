@@ -59,6 +59,9 @@ module.exports = {
     WINE_NOT_EXIST_FOR_THIS_NAME:{"isSuccess": false, "code": 3042, "message":"해당 이름의 와인이 존재하지 않습니다."},
     WINE_NOT_EXIST_INCLUDE_THIS_KEYWORD:{"isSuccess": false, "code": 3043, "message":"해당 키워드를 포함하는 와인이 존재하지 않습니다."},
 
+    WRONG_THEME:{"isSuccess": false, "code": 3044, "message":"테마명을 정확히 입력해주세요."},
+
+
     //Connection, Transaction 등의 서버 오류
     DB_ERROR : { "isSuccess": false, "code": 4000, "message": "데이터 베이스 에러"},
     SERVER_ERROR : { "isSuccess": false, "code": 4001, "message": "서버 에러"},
