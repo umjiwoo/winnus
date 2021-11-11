@@ -6,11 +6,11 @@ exports.selectWineCount=async function(connection){
     return selectWineCountQueryRow;
 };
 
-exports.selectWineCountByName=async function(connection,wineName){
+exports.selectWineCountByName=async function(connection,keyword){
     const selectWineCountQuery=`
-        SELECT count(wineId) as wineNum FROM Wine WHERE wineName=?;
+        SELECT count(wineId) as wineNum FROM Wine WHERE wineName LIKE ?;
     `;
-    const [selectWineCountQueryRow]=await connection.query(selectWineCountQuery,wineName);
+    const [selectWineCountQueryRow]=await connection.query(selectWineCountQuery,keyword);
     return selectWineCountQueryRow;
 };
 
@@ -213,19 +213,19 @@ exports.selectWineNameByKeyword=async function(connection,keyword){
     return selectWineNameByKeywordQueryRow;
 };
 
-exports.selectWineByName=async function(connection,userId,wineName){
+exports.selectWineByName=async function(connection,userId,keyword){
     const selectWineByNameQuery=`
         SELECT wineId,wineImg,wineName,country,region,quantity,price,
                CASE
                    WHEN (select status from Subscribe where wineId = Wine.wineId and userId = ?)="Y"
                        THEN "Y"
                    ELSE "N"
-                   END AS userSubscribeStatus
+                   END AS userSubscribeStatus,
                (select count(subscribeId) from Subscribe where wineId=Wine.wineId and status="Y") as subscribeCount,
                (select count(reviewId) from Review where wineId=Wine.wineId) as reviewCount
         FROM Wine
-        WHERE wineName=?;
+        WHERE wineName LIKE ?;
     `;
-    const [selectWineByNameQueryRow]=await connection.query(selectWineByNameQuery,[userId,wineName]);
+    const [selectWineByNameQueryRow]=await connection.query(selectWineByNameQuery,[userId,keyword]);
     return selectWineByNameQueryRow;
 };
