@@ -72,7 +72,7 @@ exports.retrieveWineInfo = async function (wineId) {
 
     const similarWineList = await wineDao.selectSimilarWineList(connection, sweetness, acidity, body, tannin, wineId);
 
-    console.log("와인 상세정보 조회 결과\n", [{wineInfo: wineInfo}].concat({flavorList: flavor}).concat({pairingFoodList: pairingFood}).concat({reviews: reviews}).concat({bestWineListByType: wineListByType}).concat({similarWineList: similarWineList}));
+    console.log("와인 상세정보 조회 결과\n", wineInfo,flavor,pairingFood,reviews,wineListByType,similarWineList);
 
     connection.release();
     return response(baseResponse.SUCCESS, [{wineInfo: wineInfo}].concat({flavorList: flavor}).concat({pairingFoodList: pairingFood}).concat({reviews: reviews}).concat({bestWineListByType: wineListByType}).concat({similarWineList: similarWineList}));
