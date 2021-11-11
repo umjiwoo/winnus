@@ -8,23 +8,23 @@ const baseResponse = require("../../../config/baseResponseStatus");
 
 
 // Provider: Read 비즈니스 로직 처리
-exports.retrieveWineList=async function(){
+exports.retrieveWineList=async function(userId){
     const connection=await pool.getConnection(async (conn) => conn);
-    const wineList=await wineDao.selectWineList(connection);
+    const wineList=await wineDao.selectWineList(connection,userId);
     console.log("실시간 인기 와인-전체\n",wineList);
     connection.release();
     return response(baseResponse.SUCCESS,wineList);
 };
 
-exports.retrieveWineListByType=async function(type){
+exports.retrieveWineListByType=async function(userId,type){
     const connection=await pool.getConnection(async (conn) => conn);
-    const wineList=await wineDao.selectWineListByType(connection,type);
+    const wineList=await wineDao.selectWineListByType(connection,userId,type);
     console.log("실시간 인기 와인-타입별\n",wineList);
     connection.release();
     return response(baseResponse.SUCCESS,wineList);
 };
 
-exports.retrieveTodayWineList=async function(){
+exports.retrieveTodayWineList=async function(userId){
     const connection=await pool.getConnection(async (conn) => conn);
     //전체 와인 수 조회
     const wineNum=await wineDao.selectWineCount(connection);
@@ -40,7 +40,7 @@ exports.retrieveTodayWineList=async function(){
     const todayWineList=[];
     for(let i=0;i<wineIdxList.length;i++) {
         const wineIdx=wineIdxList[i];
-        const wineRes = await wineDao.selectTodayWines(connection, wineIdx);
+        const wineRes = await wineDao.selectTodayWines(connection,userId,wineIdx);
         console.log(wineRes);
         todayWineList.push(wineRes);
     }
@@ -97,10 +97,10 @@ exports.retrieveWineReviews=async function(wineId){
     return response(baseResponse.SUCCESS,{wineReviews:retrieveWineReviewsRes});
 };
 
-exports.retrieveWineListByTheme=async function(theme){
+exports.retrieveWineListByTheme=async function(userId,theme){
     const connection=await pool.getConnection(async (conn) => conn);
     if(theme==="floral"){
-        const floralWineList=await wineDao.selectFloralWines(connection);
+        const floralWineList=await wineDao.selectFloralWines(connection,userId);
         if(floralWineList.length<1)
             return errResponse(baseResponse.WINE_NOT_EXIST_FOR_THIS_THEME);
         console.log("플로럴 아로마 와인 리스트\n",floralWineList);
@@ -108,7 +108,7 @@ exports.retrieveWineListByTheme=async function(theme){
         return response(baseResponse.SUCCESS,{themeWineList:floralWineList});
     }
     if(theme==="homeParty"){
-        const homePartyWineList=await wineDao.selectWinesForHomeParty(connection);
+        const homePartyWineList=await wineDao.selectWinesForHomeParty(connection,userId);
         if(homePartyWineList.length<1)
             return errResponse(baseResponse.WINE_NOT_EXIST_FOR_THIS_THEME);
         console.log("홈파티를 위한 와인 리스트\n",homePartyWineList);
@@ -116,7 +116,7 @@ exports.retrieveWineListByTheme=async function(theme){
         return response(baseResponse.SUCCESS,{themeWineList:homePartyWineList});
     }
     if(theme==="autumn"){
-        const wineListForAutumn=await wineDao.selectWinesForAutumn(connection);
+        const wineListForAutumn=await wineDao.selectWinesForAutumn(connection,userId);
         if(wineListForAutumn.length<1)
             return errResponse(baseResponse.WINE_NOT_EXIST_FOR_THIS_THEME);
         console.log("가을에 어울리는 와인 리스트\n",wineListForAutumn);

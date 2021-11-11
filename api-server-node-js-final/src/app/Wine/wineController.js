@@ -7,13 +7,14 @@ const {response, errResponse} = require("../../../config/response");
 const {emit} = require("nodemon");
 
 exports.getWineList=async function(req,res){
+    const userId=req.verifiedToken.userId;
     const type=req.query.type;
     if(!type) {
-        const wineList = await wineProvider.retrieveWineList();
+        const wineList = await wineProvider.retrieveWineList(userId);
         return res.send(wineList);
     }
     else{
-        const wineList=await wineProvider.retrieveWineListByType(type);
+        const wineList=await wineProvider.retrieveWineListByType(userId,type);
         return res.send(wineList);
     }
 };
@@ -35,15 +36,17 @@ exports.getWineReviews=async function(req,res){
 };
 
 exports.getTodayWineList=async function(req,res){
-    const todayWines=await wineProvider.retrieveTodayWineList();
+    const userId=req.verifiedToken.userId;
+    const todayWines=await wineProvider.retrieveTodayWineList(userId);
     return res.send(todayWines);
 };
 
 exports.getWineListByTheme=async function(req,res){
+    const userId=req.verifiedToken.userId;
     const theme=req.query.theme;
     if(!theme)
         return res.send(errResponse(baseResponse.SELECT_THEME_TO_GET));
-    const wineListByThemeRes=await wineProvider.retrieveWineListByTheme(theme);
+    const wineListByThemeRes=await wineProvider.retrieveWineListByTheme(userId,theme);
     return res.send(wineListByThemeRes);
 };
 

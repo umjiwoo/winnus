@@ -14,30 +14,48 @@ exports.selectWineCountByName=async function(connection,wineName){
     return selectWineCountQueryRow;
 };
 
-exports.selectWineList=async function(connection){
+exports.selectWineList=async function(connection,userId){
     const selectWineListQuery=`
-        SELECT wineId,wineImg,wineName,price FROM Wine ORDER BY clickCount LIMIT 18;
+        SELECT wineId,wineImg,wineName,price,
+               CASE
+                   WHEN (select status from Subscribe where wineId = Wine.wineId and userId = ?)="Y"
+                       THEN "Y"
+                   ELSE "N"
+                   END AS userSubscribeStatus
+        FROM Wine ORDER BY clickCount LIMIT 18;
     `;
-    const [selectWineListQueryRow]=await connection.query(selectWineListQuery);
+    const [selectWineListQueryRow]=await connection.query(selectWineListQuery,userId);
     return selectWineListQueryRow;
 };
 
-exports.selectTodayWines=async function(connection,wineIdx){
+exports.selectTodayWines=async function(connection,userId,wineIdx){
     const selectTodayWinesQuery=`
-        SELECT wineId,wineImg,wineName,price FROM Wine WHERE wineId=?;
+        SELECT wineId,wineImg,wineName,price,
+               CASE
+                   WHEN (select status from Subscribe where wineId = Wine.wineId and userId = ?)="Y"
+                       THEN "Y"
+                   ELSE "N"
+                   END AS userSubscribeStatus
+        FROM Wine WHERE wineId=?;
     `;
-    const [selectTodayWinesQueryRow]=await connection.query(selectTodayWinesQuery,wineIdx);
+    const [selectTodayWinesQueryRow]=await connection.query(selectTodayWinesQuery,[userId,wineIdx]);
     return selectTodayWinesQueryRow;
 };
 
-exports.selectWineListByType=async function(connection,type){
+exports.selectWineListByType=async function(connection,userId,type){
     const selectWineListByTypeQuery=`
-        SELECT wineId,wineImg,wineName,price FROM Wine
+        SELECT wineId,wineImg,wineName,price,
+               CASE
+                   WHEN (select status from Subscribe where wineId = Wine.wineId and userId = ?)="Y"
+                       THEN "Y"
+                   ELSE "N"
+                   END AS userSubscribeStatus
+        FROM Wine
         WHERE type=?
         ORDER BY clickCount
         LIMIT 18;
     `;
-    const [selectWineListByTypeQueryRow]=await connection.query(selectWineListByTypeQuery,type);
+    const [selectWineListByTypeQueryRow]=await connection.query(selectWineListByTypeQuery,[userId,type]);
     return selectWineListByTypeQueryRow;
 };
 
@@ -140,33 +158,48 @@ exports.selectWineReviews=async function(connection,wineId){
 };
 
 
-exports.selectFloralWines=async function(connection){
+exports.selectFloralWines=async function(connection,userId){
     const selectFloralWinesQuery=`
-        SELECT wineId,wineImg,wineName,price
+        SELECT wineId,wineImg,wineName,price,
+               CASE
+                   WHEN (select status from Subscribe where wineId = Wine.wineId and userId=?)="Y"
+                       THEN "Y"
+                   ELSE "N"
+                   END AS userSubscribeStatus
         FROM Wine
         WHERE wineId IN (SELECT wineId FROM Flavor WHERE subCategoryId IN (SELECT subCategoryId FROM SubFlavorCategory WHERE mainCategoryId=1));
     `;
-    const [selectFloralWinesQueryRow]=await connection.query(selectFloralWinesQuery);
+    const [selectFloralWinesQueryRow]=await connection.query(selectFloralWinesQuery,userId);
     return selectFloralWinesQueryRow;
 };
 
-exports.selectWinesForHomeParty=async function(connection){
+exports.selectWinesForHomeParty=async function(connection,userId){
     const selectWinesForHomePartyQuery=`
-        SELECT wineId,wineImg,wineName,price
+        SELECT wineId,wineImg,wineName,price,
+               CASE
+                   WHEN (select status from Subscribe where wineId = Wine.wineId and userId=?)="Y"
+                       THEN "Y"
+                   ELSE "N"
+                   END AS userSubscribeStatus
         FROM Wine
         WHERE type=4 AND 10000<=price<20000 AND sweetness=1;
     `;
-    const [selectWinesForHomePartyQueryRow]=await connection.query(selectWinesForHomePartyQuery);
+    const [selectWinesForHomePartyQueryRow]=await connection.query(selectWinesForHomePartyQuery,userId);
     return selectWinesForHomePartyQueryRow;
 };
 
-exports.selectWinesForAutumn=async function(connection){
+exports.selectWinesForAutumn=async function(connection,userId){
     const selectWinesForAutumnQuery=`
-        SELECT wineId,wineImg,wineName,price
+        SELECT wineId,wineImg,wineName,price,
+               CASE
+                   WHEN (select status from Subscribe where wineId = Wine.wineId and userId=?)="Y"
+                       THEN "Y"
+                   ELSE "N"
+                   END AS userSubscribeStatus
         FROM Wine
         WHERE (variety like "%샤르도네%" or "%피노누아%") or type=4;
     `;
-    const [selectWinesForAutumnQueryRow]=await connection.query(selectWinesForAutumnQuery);
+    const [selectWinesForAutumnQueryRow]=await connection.query(selectWinesForAutumnQuery,userId);
     return selectWinesForAutumnQueryRow;
 };
 
@@ -184,10 +217,10 @@ exports.selectWineByName=async function(connection,userId,wineName){
     const selectWineByNameQuery=`
         SELECT wineId,wineImg,wineName,country,region,quantity,price,
                CASE
-                   WHEN (select status from Subscribe where wineId = Wine.wineId and userId = ?) is not null
-                       THEN status
+                   WHEN (select status from Subscribe where wineId = Wine.wineId and userId = ?)="Y"
+                       THEN "Y"
                    ELSE "N"
-                   END AS userSubscribeStatus,
+                   END AS userSubscribeStatus
                (select count(subscribeId) from Subscribe where wineId=Wine.wineId and status="Y") as subscribeCount,
                (select count(reviewId) from Review where wineId=Wine.wineId) as reviewCount
         FROM Wine
