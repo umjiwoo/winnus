@@ -30,7 +30,7 @@ exports.selectWineList=async function(connection,userId){
 
 exports.selectTodayWines=async function(connection,userId,wineIdx){
     const selectTodayWinesQuery=`
-        SELECT wineId,wineImg,wineName,price,
+        SELECT wineId,wineImg,wineName,price,country,region,
                CASE
                    WHEN (select status from Subscribe where wineId = Wine.wineId and userId = ?)="Y"
                        THEN "Y"
@@ -113,7 +113,7 @@ exports.selectWineReviewLimit3=async function(connection,wineId){
 
 exports.selectBestWineListByType=async function(connection,wineType,wineId){
     const selectBestWineListByTypeQuery=`
-        SELECT wineId,wineImg,wineName,price
+        SELECT wineId,wineImg,wineName,price,country,region
         FROM Wine
         WHERE type=?
         NOT IN (?)
@@ -126,7 +126,7 @@ exports.selectBestWineListByType=async function(connection,wineType,wineId){
 
 exports.selectSimilarWineList=async function(connection,sweetness,acidity,body,tannin,wineId){
     const selectSimilarWineListQuery=`
-        SELECT wineId,wineImg,wineName,price
+        SELECT wineId,wineImg,wineName,price,country,region
         FROM Wine
         WHERE sweetness=? AND acidity=? AND body=? AND tannin=?
         NOT IN (?);
@@ -160,7 +160,7 @@ exports.selectWineReviews=async function(connection,wineId){
 
 exports.selectFloralWines=async function(connection,userId){
     const selectFloralWinesQuery=`
-        SELECT wineId,wineImg,wineName,price,
+        SELECT wineId,wineImg,wineName,price,country,region,
                CASE
                    WHEN (select status from Subscribe where wineId = Wine.wineId and userId=?)="Y"
                        THEN "Y"
@@ -175,7 +175,7 @@ exports.selectFloralWines=async function(connection,userId){
 
 exports.selectWinesForHomeParty=async function(connection,userId){
     const selectWinesForHomePartyQuery=`
-        SELECT wineId,wineImg,wineName,price,
+        SELECT wineId,wineImg,wineName,price,country,region,
                CASE
                    WHEN (select status from Subscribe where wineId = Wine.wineId and userId=?)="Y"
                        THEN "Y"
@@ -190,7 +190,7 @@ exports.selectWinesForHomeParty=async function(connection,userId){
 
 exports.selectWinesForAutumn=async function(connection,userId){
     const selectWinesForAutumnQuery=`
-        SELECT wineId,wineImg,wineName,price,
+        SELECT wineId,wineImg,wineName,price,country,region,
                CASE
                    WHEN (select status from Subscribe where wineId = Wine.wineId and userId=?)="Y"
                        THEN "Y"
