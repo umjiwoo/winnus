@@ -149,11 +149,12 @@ exports.retrieveWineNamesByKeyword=async function(keyword){
     return response(baseResponse.SUCCESS,{wineNames:wineNamesRes});
 };
 
-exports.retrieveWineByName=async function(wineName){
+exports.retrieveWineByName=async function(userId,wineName){
     const connection=await pool.getConnection(async (conn) => conn);
-    const retrieveWineRes=await wineDao.selectWineByName(connection,wineName);
+    const getWineNum=await wineDao.selectWineCountByName(connection,wineName);
+    const retrieveWineRes=await wineDao.selectWineByName(connection,userId,wineName);
     if(retrieveWineRes.length<1)
         return errResponse(baseResponse.WINE_NOT_EXIST_FOR_THIS_NAME);
     connection.release();
-    return response(baseResponse.SUCCESS,retrieveWineRes);
+    return response(baseResponse.SUCCESS,[{wineCount:getWineNum}].concat({retrieveWineRes:retrieveWineRes}));
 };

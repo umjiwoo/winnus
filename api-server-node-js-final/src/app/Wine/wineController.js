@@ -56,9 +56,10 @@ exports.getWineNames=async function(req,res){
 };
 
 exports.getWineByName=async function(req,res){
+    const userIdFromJWT=req.verifiedToken.userId;
     const wineName=req.query.wineName;
     if(!wineName)
         return res.send(errResponse(baseResponse.ENTER_WINE_NAME));
-    const getWineRes=await wineProvider.retrieveWineByName(wineName);
+    const getWineRes=await wineProvider.retrieveWineByName(userIdFromJWT,wineName);
     return res.send(getWineRes);
 };

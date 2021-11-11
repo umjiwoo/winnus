@@ -6,6 +6,14 @@ exports.selectWineCount=async function(connection){
     return selectWineCountQueryRow;
 };
 
+exports.selectWineCountByName=async function(connection,wineName){
+    const selectWineCountQuery=`
+        SELECT count(wineId) as wineNum FROM Wine WHERE wineName=?;
+    `;
+    const [selectWineCountQueryRow]=await connection.query(selectWineCountQuery,wineName);
+    return selectWineCountQueryRow;
+};
+
 exports.selectWineList=async function(connection){
     const selectWineListQuery=`
         SELECT wineId,wineImg,wineName,price FROM Wine ORDER BY clickCount LIMIT 18;
@@ -172,12 +180,19 @@ exports.selectWineNameByKeyword=async function(connection,keyword){
     return selectWineNameByKeywordQueryRow;
 };
 
-exports.selectWineByName=async function(connection,wineName){
+exports.selectWineByName=async function(connection,userId,wineName){
     const selectWineByNameQuery=`
-        SELECT wineId,wineImg,wineName,price
+        SELECT wineId,wineImg,wineName,country,region,quantity,price,
+               CASE
+                   WHEN (select status from Subscribe where wineId = Wine.wineId and userId = ?) is not null
+                       THEN status
+                   ELSE "N"
+                   END AS userSubscribeStatus,
+               (select count(subscribeId) from Subscribe where wineId=Wine.wineId) as subscribeCount,
+               (select count(reviewId) from Review where wineId=Wine.wineId) as reviewCount
         FROM Wine
         WHERE wineName=?;
     `;
-    const [selectWineByNameQueryRow]=await connection.query(selectWineByNameQuery,wineName);
+    const [selectWineByNameQueryRow]=await connection.query(selectWineByNameQuery,[userId,wineName]);
     return selectWineByNameQueryRow;
 };
