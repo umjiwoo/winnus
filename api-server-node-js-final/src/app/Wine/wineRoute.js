@@ -1,3 +1,5 @@
+const jwtMiddleware = require("../../../config/jwtMiddleware");
+const wine = require("./wineController");
 module.exports = function(app){
     const wine = require('./wineController');
     const jwtMiddleware = require('../../../config/jwtMiddleware');
@@ -9,6 +11,13 @@ module.exports = function(app){
 
     //테마별 와인 리스트 가져오기 api
     app.get('/app/wines/theme',jwtMiddleware,wine.getWineListByTheme);
+
+    //필터 검색 api
+    app.get('/app/wines/filter',jwtMiddleware,wine.getWineListByFilter);
+
+    //필터 검색을 위한 향,음식 리스트 내보내주기
+    app.get('/app/aromas',wine.getAromaList);
+    app.get('/app/foods',wine.getFoodList);
 
     //와인 상세 페이지 api
     app.get('/app/wines/:wineId',jwtMiddleware,wine.getWineInfo);

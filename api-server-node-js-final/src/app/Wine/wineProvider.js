@@ -5,6 +5,8 @@ const wineDao = require("./wineDao");
 
 const {response, errResponse} = require("../../../config/response");
 const baseResponse = require("../../../config/baseResponseStatus");
+const {integer} = require("twilio/lib/base/deserialize");
+const {query} = require("winston");
 
 
 // Provider: Read 비즈니스 로직 처리
@@ -72,7 +74,7 @@ exports.retrieveWineInfo = async function (wineId) {
 
     const similarWineList = await wineDao.selectSimilarWineList(connection, sweetness, acidity, body, tannin, wineId);
 
-    console.log("와인 상세정보 조회 결과\n", wineInfo,flavor,pairingFood,reviews,wineListByType,similarWineList);
+    console.log("와인 상세정보 조회 결과\n", wineInfo, flavor, pairingFood, reviews, wineListByType, similarWineList);
 
     connection.release();
     return response(baseResponse.SUCCESS, [{wineInfo: wineInfo}].concat({flavorList: flavor}).concat({pairingFoodList: pairingFood}).concat({reviews: reviews}).concat({bestWineListByType: wineListByType}).concat({similarWineList: similarWineList}));
@@ -171,8 +173,107 @@ exports.retrieveWineByName = async function (userId, keyword) {
     if (retrieveWineRes.length < 1)
         return errResponse(baseResponse.WINE_NOT_EXIST_FOR_THIS_KEYWORD);
 
-    console.log("키워드로 와인 검색\n",retrieveWineRes);
+    console.log("키워드로 와인 검색\n", retrieveWineRes);
 
     connection.release();
     return response(baseResponse.SUCCESS, [{wineCount: getWineNum}].concat({retrieveWineRes: retrieveWineRes}));
+};
+
+exports.retrieveWinesByFilter = async function (userId, type, taste, flavors, foods, price) {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    let typeList=[];
+    let tasteList=[];
+    let flavorList=[];
+    let foodList=[];
+    let priceScope=[];
+
+    if (type) {
+        typeList = type.split(',');
+        for(let i in typeList){
+            typeList[i]=integer(typeList[i]);
+        }
+        console.log("1-1\n",typeList);
+    }
+    if (taste) {
+        tasteList = taste.split(',');
+        for(let i in tasteList){
+            tasteList[i]=integer(tasteList[i]);
+        }
+        console.log("2-1\n",tasteList);
+    }
+    if (flavors) {
+        flavorList = flavors.split(',');
+        for(let i in flavorList){
+            flavorList[i]=integer(flavorList[i]);
+        }
+        console.log("3-1\n",flavorList);
+    }
+    if (foods) {
+        foodList = foods.split(',');
+        for(let i in foodList){
+            foodList[i]=integer(foodList[i]);
+        }
+        console.log("4-1\n",foodList);
+    }
+    if(price){
+        priceScope=price.split('~');
+        for(let i in priceScope){
+            priceScope[i]=integer(priceScope[i]);
+        }
+        console.log("5-1\n",priceScope);
+    }
+
+
+    let sql = "SELECT distinct w.wineId,w.wineImg,w.wineName,w.price,w.country,w.region," +
+        "CASE WHEN (select status from Subscribe where wineId = w.wineId and userId = ?) = 'Y' THEN 'Y' ELSE 'N' END AS userSubscribeStatus,"+
+        "(select count(subscribeId) from Subscribe where wineId=w.wineId) as subscribeCount," +
+        "(select count(reviewId) from Review where wineId=w.wineId) as reviewCount ";
+    sql+="FROM Wine w,Flavor f,FoodPairing fp ";
+    sql+="WHERE (sweetness=? and acidity=? and body=? and tannin=?)";
+
+
+    let queryParams=[userId,tasteList[0],tasteList[1],tasteList[2],tasteList[3]];
+
+    if(type) {
+        sql += " and (w.type in (?))";
+        queryParams.push(typeList);
+    }
+    if(flavors) {
+        sql += " and (f.subCategoryId in (?) and f.wineId=w.wineId)";
+        queryParams.push(flavorList);
+    }
+
+    if(foods) {
+        sql += " and (fp.foodCategoryId in (?) and fp.wineId=w.wineId)";
+        queryParams.push(foodList);
+    }
+    if(price) {
+        sql += " and (price !='-' and price >= ? and price <= ?)";
+        queryParams.push(priceScope[0],priceScope[1]);
+    }
+    sql+=";";
+
+    console.log("쿼리문: ",sql);
+    console.log("쿼리 파라미터",queryParams);
+
+    const [exec]=await connection.query(sql,queryParams);
+    const resCount=exec.length;
+
+    console.log("쿼리 결과\n",exec);
+
+    connection.release();
+    return response(baseResponse.SUCCESS,[{filteringResCount:resCount}].concat({filteringRes:exec}));
+};
+
+exports.retrieveWineAromaList=async function(){
+    const connection=await pool.getConnection(async (conn) => conn);
+    const retrieveWineAromaListRes=await wineDao.selectWineAromas(connection);
+    return response(baseResponse.SUCCESS,retrieveWineAromaListRes);
+};
+
+exports.retrieveWineFoodList=async function(){
+    const connection=await pool.getConnection(async (conn) => conn);
+    const retrieveWineFoodListRes=await wineDao.selectWineFoods(connection);
+    return response(baseResponse.SUCCESS,retrieveWineFoodListRes);
 };

@@ -37,6 +37,8 @@ module.exports = {
 
     ENTER_WILLING_TO_SUBSCRIBE_WINE_ID:{ "isSuccess": false, "code": 2033, "message":"찜할 와인 인덱스를 입력해주세요."},
 
+    TASTE_LIST_EMPTY:{"isSuccess": false, "code": 2034, "message":"맛(당도,산도,바디감,타닌감)은 필수 선택 요소입니다."},
+
 
     // Response error
     ALREADY_SIGN_UP:{"isSuccess": false, "code": 3001, "message":"이미 가입되어 있는 전화번호입니다."},
