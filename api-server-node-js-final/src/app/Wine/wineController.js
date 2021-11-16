@@ -70,12 +70,9 @@ exports.getWineByName=async function(req,res){
 exports.getWineListByFilter=async function(req,res){
     const userIdFromJWT=req.verifiedToken.userId;
     const {type,taste,flavors,foods,price}=req.query;
-    console.log("쿼리 스트링 값");
-    console.log("type\n",type);
-    console.log("taste\n",taste);
-    console.log("flavors\n",flavors);
-    console.log("foods\n",foods);
-    console.log("price\n",price);
+
+    if(!taste)
+        return res.send(errResponse(baseResponse.TASTE_LIST_EMPTY));
     const getWineListByFilterRes=await wineProvider.retrieveWinesByFilter(userIdFromJWT,type,taste,flavors,foods,price);
     return res.send(getWineListByFilterRes);
 };

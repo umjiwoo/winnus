@@ -74,7 +74,7 @@ exports.selectWineListByType = async function (connection, userId, type) {
     return selectWineListByTypeQueryRow;
 };
 
-exports.selectWineListByTaste = async function (connection,userId,type, sweetness, acidity, body, tannin) {
+exports.selectWineListByTaste = async function (connection, userId, type, sweetness, acidity, body, tannin) {
     const selectWineListByTasteQuery = `
         SELECT *
         FROM (SELECT wineId,
@@ -88,12 +88,19 @@ exports.selectWineListByTaste = async function (connection,userId,type, sweetnes
                              THEN "Y"
                          ELSE "N"
                          END AS userSubscribeStatus,
-                     type,sweetness,acidity,body,tannin
+                     type,
+                     sweetness,
+                     acidity,
+                     body,
+                     tannin
               FROM Wine
               WHERE type = ?) as firstFilteringRes
-        WHERE firstFilteringRes.sweetness = ? AND firstFilteringRes.acidity = ? AND firstFilteringRes.body = ? AND firstFilteringRes.tannin = ?;
+        WHERE firstFilteringRes.sweetness = ?
+          AND firstFilteringRes.acidity = ?
+          AND firstFilteringRes.body = ?
+          AND firstFilteringRes.tannin = ?;
     `;
-    const [selectWineListByTasteQueryRow] = await connection.query(selectWineListByTasteQuery, [userId,type, sweetness, acidity, body, tannin]);
+    const [selectWineListByTasteQueryRow] = await connection.query(selectWineListByTasteQuery, [userId, type, sweetness, acidity, body, tannin]);
     return selectWineListByTasteQueryRow;
 };
 
@@ -297,7 +304,7 @@ exports.selectWineByName = async function (connection, userId, keyword) {
                    WHEN (select status from Subscribe where wineId = Wine.wineId and userId = ?) = "Y"
                        THEN "Y"
                    ELSE "N"
-                   END                                                                                AS userSubscribeStatus,
+                   END AS userSubscribeStatus,
                (select count(subscribeId) from Subscribe where wineId = Wine.wineId and status = "Y") as subscribeCount,
                (select count(reviewId) from Review where wineId = Wine.wineId)                        as reviewCount
         FROM Wine
@@ -306,3 +313,101 @@ exports.selectWineByName = async function (connection, userId, keyword) {
     const [selectWineByNameQueryRow] = await connection.query(selectWineByNameQuery, [userId, keyword]);
     return selectWineByNameQueryRow;
 };
+
+// exports.selectWineByFiltering = async function (connection, userId, typeList, tasteList, flavorList, foodList, priceScope) {
+//     const selectWineByFilteringQuery = `
+// drop procedure if exists filtering;
+//
+// create procedure filtering(sweetness int,acidity int,body int,tannin int,type int,subCategoryId int,foodCategoryId int,price int);
+//
+// begin
+// declare whereClause varchar(1000);
+// set @selectClause="select distinct w.wineId,w.wineImg,w.wineName,w.price,w.country,w.region,
+//         IF((select status from Subscribe where wineId = w.wineId and userId = ?) = "Y", "Y", "N") AS userSubscribeStatus
+//  from Wine w
+//     join Flavor f
+//     join FoodPairing p
+//     on w.wineId = f.wineId and w.wineId = p.wineId and f.wineId = p.wineId";
+//
+// set whereClause="where w.sweetness = ? and w.acidity = ? and w.body = ? and w.tannin = ?";
+// if(typeList is not null) then set whereClause=concat(whereClause,"and w.type=?");
+// if(flavorsList is not null) then set whereClause=concat(whereClause,"and f.subCategoryId = ?");
+// if(foodList is not null) then set whereClause=concat(whereClause,"and p.foodCategoryId=?");
+// if (priceScope is not null) then set whereClause=concat(whereClause,"and cast(price as UNSIGNED) between ? and ?");
+// end if;
+//
+// set @executeSql=concat(@selectClause,whereClause);
+//
+// prepare stmt from @executeSql;
+//
+// set @userId=userId;
+// set @type=typeList[0];
+// set @sweetness=tasteList[0];
+// set @acidity=tasteList[1];
+// set @body=tasteList[2];
+// set @tannin=tasteList[3];
+// set @subCategoryId=flavorList[0];
+// set @foodCategoryId=foodList[0];
+// set @bPrice=priceScope[0];
+// set @ePrice=priceScope[1];
+//
+// execute stmt using @userId,@sweetness,@acidity,@body,@tannin,@type,@subCategoryId,@foodCategoryId,@price;
+//
+// deallocate prepare stmt;
+// end
+// `;
+//
+//
+// //     const selectWineByFilteringQuery =`
+// //         set @type=?;
+// //         set @sweetness=?;
+// //         set @acidity=?;
+// //         set @body=?;
+// //         set @tannin=?;
+// //         set @subCategoryId=?;
+// //         set @foodCategoryId=?;
+// //         set @bPrice=?;
+// //         set @ePrice=?;
+// //
+// //         SELECT distinct w.wineId,w.wineImg,w.wineName,w.price,w.country,w.region
+// //         FROM Wine w join Flavor f join FoodPairing fp on w.wineId=f.wineId and w.wineId=fp.wineId and f.wineId=fp.wineId
+// //         WHERE w.sweetness = ? and w.acidity = ? and w.body = ? and w.tannin = ?
+// //                 if (typeList)
+// //                     and type=?
+// //                 if (flavorList)
+// //                     and subCategoryId=?
+// //                 if (foodList)
+// //                     and foodCategoryId=?
+// //                 if (price)
+// //                     and price between ? and ?
+// //             ;
+// //     `;
+//
+//
+//     const [selectWineByFilteringQueryRow] = await connection.query(selectWineByFilteringQuery, [userId, tasteList[0], tasteList[1], tasteList[2], tasteList[3], typeList[0]], typeList[0], flavorList[0], foodList[0], priceScope[0], priceScope[1]);
+//     //const [selectWineByFilteringQueryRow] = await connection.query(selectWineByFilteringQuery,[typeList[0],tasteList[0],tasteList[1],tasteList[3],tasteList[3],flavorList[0],foodList[0],priceScope[0],priceScope[1]]);
+//     return selectWineByFilteringQueryRow;
+// };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
