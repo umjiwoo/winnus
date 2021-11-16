@@ -15,6 +15,10 @@ module.exports = function(app){
     //필터 검색 api
     app.get('/app/wines/filter',jwtMiddleware,wine.getWineListByFilter);
 
+    //필터 검색을 위한 향,음식 리스트 내보내주기
+    app.get('/app/aromas',wine.getAromaList);
+    app.get('/app/foods',wine.getFoodList);
+
     //와인 상세 페이지 api
     app.get('/app/wines/:wineId',jwtMiddleware,wine.getWineInfo);
 
@@ -26,6 +30,4 @@ module.exports = function(app){
 
     //와인 이름 검색 api
     app.get('/app/wines',jwtMiddleware,wine.getWineByName);
-
-
 };

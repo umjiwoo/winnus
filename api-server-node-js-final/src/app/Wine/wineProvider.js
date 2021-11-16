@@ -265,3 +265,15 @@ exports.retrieveWinesByFilter = async function (userId, type, taste, flavors, fo
     connection.release();
     return response(baseResponse.SUCCESS,[{filteringResCount:resCount}].concat({filteringRes:exec}));
 };
+
+exports.retrieveWineAromaList=async function(){
+    const connection=await pool.getConnection(async (conn) => conn);
+    const retrieveWineAromaListRes=await wineDao.selectWineAromas(connection);
+    return response(baseResponse.SUCCESS,retrieveWineAromaListRes);
+};
+
+exports.retrieveWineFoodList=async function(){
+    const connection=await pool.getConnection(async (conn) => conn);
+    const retrieveWineFoodListRes=await wineDao.selectWineFoods(connection);
+    return response(baseResponse.SUCCESS,retrieveWineFoodListRes);
+};
