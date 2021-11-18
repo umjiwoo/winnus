@@ -225,7 +225,7 @@ exports.retrieveWinesByFilter = async function (userId, type, taste, flavors, fo
     }
 
 
-    let sql = "SELECT distinct w.wineId,w.wineImg,w.wineName,w.price,w.country,w.region," +
+    let sql = "SELECT distinct w.wineId,w.wineImg,w.wineName,w.price,w.quantity,w.country,w.region," +
         "CASE WHEN (select status from Subscribe where wineId = w.wineId and userId = ?) = 'Y' THEN 'Y' ELSE 'N' END AS userSubscribeStatus,"+
         "(select count(subscribeId) from Subscribe where wineId=w.wineId) as subscribeCount," +
         "(select count(reviewId) from Review where wineId=w.wineId) as reviewCount," +

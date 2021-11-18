@@ -300,6 +300,7 @@ exports.selectWineByName = async function (connection, userId, keyword) {
                region,
                quantity,
                price,
+               quantity,
                CASE
                    WHEN (select status from Subscribe where wineId = Wine.wineId and userId = ?) = "Y"
                        THEN "Y"
