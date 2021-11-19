@@ -285,7 +285,7 @@ exports.retrieveAllWineShop = async function () {
     const retrieveWineShopList = await wineDao.selectAllWineShop(connection);
 
     connection.release();
-    return response(baseResponse.SUCCESS, [wineShopCount].concat({shopList: retrieveWineShopList}));
+    return response(baseResponse.SUCCESS,[{wineShopCount:wineShopCount[0].shopNum}].concat({shopList: retrieveWineShopList}));
 };
 
 exports.retrieveWineShopByArea = async function (area) {
@@ -296,37 +296,42 @@ exports.retrieveWineShopByArea = async function (area) {
     if (retrieveWineShopListByArea.length < 1)
         errResponse(baseResponse.WINE_SHOP_NOT_EXIST);
     connection.release();
-    return response(baseResponse.SUCCESS, [wineShopCount].concat({shopList: retrieveWineShopListByArea}));
+    return response(baseResponse.SUCCESS, [{wineShopCount:wineShopCount[0].shopNum}].concat({shopList: retrieveWineShopListByArea}));
 };
 
 exports.retrieveWineShop = async function (wineName, area) {
     const connection = await pool.getConnection(async (conn) => conn);
 
     //와인 진짜 있는 와인인지,와인 인덱스 알아오기
-    // const nameSplitList = wineName.split("");
-    // const repeatNum = nameSplitList.length;
-    //
-    // for (let i = 0; i < repeatNum; i++) {
-    //     nameSplitList.splice(i * 2, 0, "%");
-    // }
-    // nameSplitList.push("%");
-    // wineName = nameSplitList.join("");
+    const nameSplitList = wineName.split("");
+    const repeatNum = nameSplitList.length;
 
+    for (let i = 0; i < repeatNum; i++) {
+        nameSplitList.splice(i * 2, 0, "%");
+    }
+    nameSplitList.push("%");
+    wineName = nameSplitList.join("");
 
     const wineCheck = await wineDao.selectWineIdByName(connection, wineName);
     if (wineCheck.length < 1)
         return errResponse(baseResponse.WINE_SEARCH_BY_NAME_NOT_EXIST);
 
-    console.log(wineCheck[0]);
-    const wineId=wineCheck[0].wineId;
+    console.log(wineCheck);
+    //const wineId=wineCheck[0].wineId;
 
     area = "%" + area + "%";
-    const wineShopCount=await wineDao.selectCountWineShop(connection,wineId,area);
+    for(let i=0;i<wineCheck.length;i++){
+        wineCheck[i]=wineCheck[i].wineId;
+    }
+    console.log(wineCheck);
+    const queryParams=[area,wineCheck];
+    console.log(queryParams);
+    const wineShopCount=await wineDao.selectCountWineShop(connection,queryParams);
 
-    const retrieveWineShopRes=await wineDao.selectWineShop(connection,wineId,area);
+    const retrieveWineShopRes=await wineDao.selectWineShop(connection,queryParams);
     if(retrieveWineShopRes.length<1)
         errResponse(baseResponse.WINE_SHOP_NOT_EXIST_INCLUDING_THIS_WINE);
 
     connection.release();
-    return response(baseResponse.SUCCESS, [wineShopCount].concat({shopList: retrieveWineShopRes}));
+    return response(baseResponse.SUCCESS, [{wineShopCount:wineShopCount[0].shopNum}].concat({shopList: retrieveWineShopRes}));
 };
