@@ -330,3 +330,71 @@ exports.selectWineFoods=async function(connection){
     const [selectWineFoodsQueryRow]=await connection.query(selectWineFoodsQuery);
     return selectWineFoodsQueryRow;
 };
+
+exports.selectCountAllWineShop=async function(connection){
+    const selectCountWineShopQuery=`
+        SELECT count(shopId) as shopNum
+        FROM Shop;
+    `;
+    const [selectCountWineShopQueryRow]=await connection.query(selectCountWineShopQuery);
+    return selectCountWineShopQueryRow;
+};
+
+exports.selectCountWineShopByArea=async function(connection,area){
+    const selectCountWineShopByAreaQuery=`
+        SELECT count(shopId) as shopNum
+        FROM Shop
+        WHERE location LIKE ?;
+    `;
+    const [selectCountWineShopByAreaQueryRow]=await connection.query(selectCountWineShopByAreaQuery,area);
+    return selectCountWineShopByAreaQueryRow;
+};
+
+exports.selectCountWineShop=async function(connection,wineId,area){
+    const selectCountWineShopQuery=`
+        SELECT count(shopId) as shopNum
+        FROM Shop
+        WHERE location LIKE ? AND shopId IN (select shopId from ShopWine where wineId=?);
+    `;
+    const [selectCountWineShopQueryRow]=await connection.query(selectCountWineShopQuery,[area,wineId]);
+    return selectCountWineShopQueryRow;
+};
+
+exports.selectAllWineShop=async function(connection){
+    const selectWineShopQuery=`
+        SELECT shopId,shopName,shopCategory,location,tel
+        FROM Shop;
+    `;
+    const [selectWineShopQueryRow]=await connection.query(selectWineShopQuery);
+    return selectWineShopQueryRow;
+};
+
+exports.selectWineShopByArea=async function(connection,area){
+    const selectWineShopByAreaQuery=`
+        SELECT shopId,shopName,shopCategory,location,tel
+        FROM Shop
+        WHERE location LIKE ?;
+    `;
+    const [selectWineShopByAreaQueryRow]=await connection.query(selectWineShopByAreaQuery,area);
+    return selectWineShopByAreaQueryRow;
+};
+
+exports.selectWineIdByName=async function(connection,wineName){
+    const selectWineIdByNameQuery=`
+        SELECT wineId
+        FROM Wine
+        WHERE wineName=?;
+    `;
+    const [selectWineIdByNameQueryRow]=await connection.query(selectWineIdByNameQuery,wineName);
+    return selectWineIdByNameQueryRow;
+};
+
+exports.selectWineShop=async function(connection,wineId,area){
+    const selectWineShopQuery=`
+        SELECT shopId,shopName,shopCategory,location,tel
+        FROM Shop
+        WHERE location LIKE ? AND shopId IN (select shopId from ShopWine where wineId=?);
+    `;
+    const [selectWineShopQueryRow]=await connection.query(selectWineShopQuery,[area,wineId]);
+    return selectWineShopQueryRow;
+};
