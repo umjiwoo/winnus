@@ -87,3 +87,21 @@ exports.getFoodList=async function(req,res){
     const getFoodListRes=await wineProvider.retrieveWineFoodList();
     return res.send(getFoodListRes);
 };
+
+exports.getShops=async function(req,res){
+    const {wineName,area}=req.query;
+    let getShopRes;
+    if(!wineName&&!area){ //이름과 지역 지정x -> 전체 와인샵 조회
+        getShopRes=await wineProvider.retrieveAllWineShop();
+    }
+    else if(!wineName){ //이름 지정x -> 지역 와인샵 조회
+        getShopRes=await wineProvider.retrieveWineShopByArea(area);
+    }
+    else if(!area){
+        return res.send(errResponse(baseResponse.GOTO_WINE_SEARCH));
+    }
+    else{
+        getShopRes=await wineProvider.retrieveWineShop(wineName,area);
+    }
+    return res.send(getShopRes);
+};

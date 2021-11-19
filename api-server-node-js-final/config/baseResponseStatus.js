@@ -39,6 +39,7 @@ module.exports = {
 
     TASTE_LIST_EMPTY:{"isSuccess": false, "code": 2034, "message":"맛(당도,산도,바디감,타닌감)은 필수 선택 요소입니다."},
 
+    GOTO_WINE_SEARCH:{"isSuccess": false, "code": 2035, "message":"와인 검색 탭에서 검색해주세요."},
 
     // Response error
     ALREADY_SIGN_UP:{"isSuccess": false, "code": 3001, "message":"이미 가입되어 있는 전화번호입니다."},
@@ -63,6 +64,9 @@ module.exports = {
 
     WRONG_THEME:{"isSuccess": false, "code": 3044, "message":"테마명을 정확히 입력해주세요."},
 
+    WINE_SHOP_NOT_EXIST:{"isSuccess": false, "code": 3045, "message":"검색 조건에 맞는 와인샵이 존재하지 않습니다."},
+    WINE_SHOP_NOT_EXIST_INCLUDING_THIS_WINE:{"isSuccess": false, "code": 3046, "message":"해당 와인을 보유한 상점이 없습니다."},
+    WINE_SEARCH_BY_NAME_NOT_EXIST:{"isSuccess": false, "code": 3047, "message":"해당 와인이 존재하지 않습니다. 와인 이름을 정확히 입력해 주세요."},
 
     //Connection, Transaction 등의 서버 오류
     DB_ERROR : { "isSuccess": false, "code": 4000, "message": "데이터 베이스 에러"},

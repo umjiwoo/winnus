@@ -30,4 +30,7 @@ module.exports = function(app){
 
     //와인 이름 검색 api
     app.get('/app/wines',jwtMiddleware,wine.getWineByName);
+
+    //와인 상점 검색
+    app.get('/app/shops',jwtMiddleware,wine.getShops);
 };
