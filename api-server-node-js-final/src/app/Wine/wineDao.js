@@ -389,12 +389,22 @@ exports.selectWineIdByName=async function(connection,wineName){
     return selectWineIdByNameQueryRow;
 };
 
-exports.selectWineShop=async function(connection,queryParams){
-    const selectWineShopQuery=`
+exports.selectWineShopByWineId=async function(connection,wineId){
+    const selectWineShopByWineIdQuery=`
         SELECT shopId,shopName,shopCategory,location,tel
         FROM Shop
-        WHERE location LIKE ? AND shopId IN (select shopId from ShopWine where wineId in (?));
+        WHERE shopId IN (select shopId from ShopWine where wineId=?);
     `;
-    const [selectWineShopQueryRow]=await connection.query(selectWineShopQuery,queryParams);
-    return selectWineShopQueryRow;
+    const [selectWineShopByWineIdQueryRow]=await connection.query(selectWineShopByWineIdQuery,wineId);
+    return selectWineShopByWineIdQueryRow;
+};
+
+exports.selectWineShopByAreaWineList=async function(connection,queryParams){
+    const selectWineShopByAreaWineListQuery=`
+        SELECT shopId,shopName,shopCategory,location,tel
+        FROM Shop
+        WHERE location LIKE ? AND shopId IN (select shopId from ShopWine where wineId in ?);
+    `;
+    const [selectWineShopByAreaWineListQueryRow]=await connection.query(selectWineShopByAreaWineListQuery,queryParams);
+    return selectWineShopByAreaWineListQueryRow;
 };

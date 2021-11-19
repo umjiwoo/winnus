@@ -59,6 +59,7 @@ exports.retrieveWineInfo = async function (wineId) {
         return errResponse(baseResponse.WINE_NOT_EXIST);
 
     const wineInfo = await wineDao.selectWineInfo(connection, wineId);
+    const wineShopRes=await wineDao.selectWineShopByWineId(connection,wineId);
     const flavor = await wineDao.selectWineFlavor(connection, wineId);
     const pairingFood = await wineDao.selectPairingFood(connection, wineId);
     const reviews = await wineDao.selectWineReviewLimit3(connection, wineId);
@@ -74,10 +75,10 @@ exports.retrieveWineInfo = async function (wineId) {
 
     const similarWineList = await wineDao.selectSimilarWineList(connection, sweetness, acidity, body, tannin, wineId);
 
-    console.log("와인 상세정보 조회 결과\n", wineInfo, flavor, pairingFood, reviews, wineListByType, similarWineList);
+    console.log("와인 상세정보 조회 결과\n", wineInfo, wineShopRes, flavor, pairingFood, reviews, wineListByType, similarWineList);
 
     connection.release();
-    return response(baseResponse.SUCCESS, [{wineInfo: wineInfo}].concat({flavorList: flavor}).concat({pairingFoodList: pairingFood}).concat({reviews: reviews}).concat({bestWineListByType: wineListByType}).concat({similarWineList: similarWineList}));
+    return response(baseResponse.SUCCESS, [{wineInfo: wineInfo}].concat({wineShops: wineShopRes}).concat({flavorList: flavor}).concat({pairingFoodList: pairingFood}).concat({reviews: reviews}).concat({bestWineListByType: wineListByType}).concat({similarWineList: similarWineList}));
 };
 
 exports.wineCheck = async function (wineId) {
@@ -328,7 +329,7 @@ exports.retrieveWineShop = async function (wineName, area) {
     console.log(queryParams);
     const wineShopCount=await wineDao.selectCountWineShop(connection,queryParams);
 
-    const retrieveWineShopRes=await wineDao.selectWineShop(connection,queryParams);
+    const retrieveWineShopRes=await wineDao.selectWineShopByAreaWineList(connection,queryParams);
     if(retrieveWineShopRes.length<1)
         errResponse(baseResponse.WINE_SHOP_NOT_EXIST_INCLUDING_THIS_WINE);
 
