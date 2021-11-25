@@ -133,7 +133,7 @@ exports.selectWineInfo = async function (connection, wineId) {
 
 exports.selectWineFlavor = async function (connection, wineId) {
     const selectWineFlavorQuery = `
-        SELECT flavor,flavorImg
+        SELECT flavor, flavorImg
         FROM SubFlavorCategory
         WHERE subCategoryId in (SELECT subCategoryId FROM Flavor WHERE wineId = ?);
     `;
@@ -143,7 +143,7 @@ exports.selectWineFlavor = async function (connection, wineId) {
 
 exports.selectPairingFood = async function (connection, wineId) {
     const selectPairingFoodQuery = `
-        SELECT food,foodImg
+        SELECT food, foodImg
         From FoodCategory
         WHERE foodCategoryId IN (SELECT foodCategoryId FROM FoodPairing WHERE wineId = ?);
     `;
@@ -151,16 +151,16 @@ exports.selectPairingFood = async function (connection, wineId) {
     return selectPairingFoodQueryRow;
 };
 
-exports.selectPairingFoodList=async function(connection,shopWineList){
-    const selectPairingFoodListQuery=`
+exports.selectPairingFoodList = async function (connection, shopWineList) {
+    const selectPairingFoodListQuery = `
         SELECT food
         From FoodCategory
-        WHERE foodCategoryId 
-                  IN (SELECT distinct foodCategoryId 
-                        FROM FoodPairing 
-                        WHERE wineId IN (?));
+        WHERE foodCategoryId
+                  IN (SELECT distinct foodCategoryId
+                      FROM FoodPairing
+                      WHERE wineId IN (?));
     `;
-    const [selectPairingFoodListQueryRow]=await connection.query(selectPairingFoodListQuery,shopWineList);
+    const [selectPairingFoodListQueryRow] = await connection.query(selectPairingFoodListQuery, shopWineList);
     return selectPairingFoodListQueryRow;
 };
 
@@ -214,17 +214,38 @@ exports.selectWineStatus = async function (connection, wineId) {
     return selectWineStatusQueryRow;
 };
 
-exports.selectWineReviews = async function (connection, wineId) {
+exports.selectWineReviewId = async function (connection, wineId) {
+    const selectWineReviewIdQuery = `
+        SELECT reviewId
+        FROM Review
+        WHERE wineId = ?;
+    `;
+    const [selectWineReviewIdQueryRow] = await connection.query(selectWineReviewIdQuery, wineId);
+    return selectWineReviewIdQueryRow;
+};
+
+exports.selectWineTags = async function (connection, reviewId) {
+    const selectWineTagsQuery = `
+        SELECT content
+        FROM Tag
+        WHERE tagId IN (select tagId from Tag where reviewId = ?);
+    `;
+    const [selectWineTagsQueryRow] = await connection.query(selectWineTagsQuery, reviewId);
+    return selectWineTagsQueryRow;
+};
+
+
+exports.selectWineReviews = async function (connection, reviewId) {
     const selectWineReviewsQuery = `
-        SELECT rating,
+        SELECT reviewId,
+               rating,
                content,
                (select DATE_FORMAT(createdAt, '%Y.%m.%d'))              as createdAt,
                (select nickname from User where userId = Review.userId) as userName
         FROM Review
-        WHERE wineId = ?
-        ORDER BY createdAt DESC;
+        WHERE reviewId = ?;
     `;
-    const [selectWineReviewsQueryRow] = await connection.query(selectWineReviewsQuery, wineId);
+    const [selectWineReviewsQueryRow] = await connection.query(selectWineReviewsQuery, reviewId);
     return selectWineReviewsQueryRow;
 };
 
@@ -317,7 +338,7 @@ exports.selectWineByName = async function (connection, userId, keyword) {
                    WHEN (select status from Subscribe where wineId = Wine.wineId and userId = ?) = "Y"
                        THEN "Y"
                    ELSE "N"
-                   END AS userSubscribeStatus,
+                   END                                                                                AS userSubscribeStatus,
                (select count(subscribeId) from Subscribe where wineId = Wine.wineId and status = "Y") as subscribeCount,
                (select count(reviewId) from Review where wineId = Wine.wineId)                        as reviewCount
         FROM Wine
@@ -327,112 +348,116 @@ exports.selectWineByName = async function (connection, userId, keyword) {
     return selectWineByNameQueryRow;
 };
 
-exports.selectWineAromas=async function(connection){
-    const selectWineAromasQuery=`
-        SELECT subCategoryId,flavor FROM SubFlavorCategory;
+exports.selectWineAromas = async function (connection) {
+    const selectWineAromasQuery = `
+        SELECT subCategoryId, flavor
+        FROM SubFlavorCategory;
     `;
-    const [selectWineAromasQueryRow]=await connection.query(selectWineAromasQuery);
+    const [selectWineAromasQueryRow] = await connection.query(selectWineAromasQuery);
     return selectWineAromasQueryRow;
 };
 
-exports.selectWineFoods=async function(connection){
-    const selectWineFoodsQuery=`
-        SELECT foodCategoryId,food FROM FoodCategory;
+exports.selectWineFoods = async function (connection) {
+    const selectWineFoodsQuery = `
+        SELECT foodCategoryId, food
+        FROM FoodCategory;
     `;
-    const [selectWineFoodsQueryRow]=await connection.query(selectWineFoodsQuery);
+    const [selectWineFoodsQueryRow] = await connection.query(selectWineFoodsQuery);
     return selectWineFoodsQueryRow;
 };
 
-exports.selectCountAllWineShop=async function(connection){
-    const selectCountWineShopQuery=`
+exports.selectCountAllWineShop = async function (connection) {
+    const selectCountWineShopQuery = `
         SELECT count(shopId) as shopNum
         FROM Shop;
     `;
-    const [selectCountWineShopQueryRow]=await connection.query(selectCountWineShopQuery);
+    const [selectCountWineShopQueryRow] = await connection.query(selectCountWineShopQuery);
     return selectCountWineShopQueryRow;
 };
 
-exports.selectCountWineShopByArea=async function(connection,area){
-    const selectCountWineShopByAreaQuery=`
+exports.selectCountWineShopByArea = async function (connection, area) {
+    const selectCountWineShopByAreaQuery = `
         SELECT count(shopId) as shopNum
         FROM Shop
         WHERE location LIKE ?;
     `;
-    const [selectCountWineShopByAreaQueryRow]=await connection.query(selectCountWineShopByAreaQuery,area);
+    const [selectCountWineShopByAreaQueryRow] = await connection.query(selectCountWineShopByAreaQuery, area);
     return selectCountWineShopByAreaQueryRow;
 };
 
-exports.selectCountWineShop=async function(connection,queryParams){
-    const selectCountWineShopQuery=`
+exports.selectCountWineShop = async function (connection, queryParams) {
+    const selectCountWineShopQuery = `
         SELECT count(shopId) as shopNum
         FROM Shop
-        WHERE location LIKE ? AND shopId IN (select shopId from ShopWine where wineId in (?));
+        WHERE location LIKE ?
+          AND shopId IN (select shopId from ShopWine where wineId in (?));
     `;
-    const [selectCountWineShopQueryRow]=await connection.query(selectCountWineShopQuery,queryParams);
+    const [selectCountWineShopQueryRow] = await connection.query(selectCountWineShopQuery, queryParams);
     return selectCountWineShopQueryRow;
 };
 
-exports.selectAllWineShop=async function(connection){
-    const selectWineShopQuery=`
-        SELECT shopId,shopName,shopCategory,location,tel
+exports.selectAllWineShop = async function (connection) {
+    const selectWineShopQuery = `
+        SELECT shopId, shopName, shopCategory, location, tel
         FROM Shop;
     `;
-    const [selectWineShopQueryRow]=await connection.query(selectWineShopQuery);
+    const [selectWineShopQueryRow] = await connection.query(selectWineShopQuery);
     return selectWineShopQueryRow;
 };
 
-exports.selectWineShopByArea=async function(connection,area){
-    const selectWineShopByAreaQuery=`
-        SELECT shopId,shopName,shopCategory,location,tel
+exports.selectWineShopByArea = async function (connection, area) {
+    const selectWineShopByAreaQuery = `
+        SELECT shopId, shopName, shopCategory, location, tel
         FROM Shop
         WHERE location LIKE ?;
     `;
-    const [selectWineShopByAreaQueryRow]=await connection.query(selectWineShopByAreaQuery,area);
+    const [selectWineShopByAreaQueryRow] = await connection.query(selectWineShopByAreaQuery, area);
     return selectWineShopByAreaQueryRow;
 };
 
-exports.selectWineIdByName=async function(connection,wineName){
-    const selectWineIdByNameQuery=`
+exports.selectWineIdByName = async function (connection, wineName) {
+    const selectWineIdByNameQuery = `
         SELECT wineId
         FROM Wine
         WHERE wineName LIKE ?;
     `;
-    const [selectWineIdByNameQueryRow]=await connection.query(selectWineIdByNameQuery,wineName);
+    const [selectWineIdByNameQueryRow] = await connection.query(selectWineIdByNameQuery, wineName);
     return selectWineIdByNameQueryRow;
 };
 
-exports.selectWineShopByWineId=async function(connection,wineId){
-    const selectWineShopByWineIdQuery=`
-        SELECT shopId,shopName,shopCategory,location,tel
+exports.selectWineShopByWineId = async function (connection, wineId) {
+    const selectWineShopByWineIdQuery = `
+        SELECT shopId, shopName, shopCategory, location, tel
         FROM Shop
-        WHERE shopId IN (select shopId from ShopWine where wineId=?);
+        WHERE shopId IN (select shopId from ShopWine where wineId = ?);
     `;
-    const [selectWineShopByWineIdQueryRow]=await connection.query(selectWineShopByWineIdQuery,wineId);
+    const [selectWineShopByWineIdQueryRow] = await connection.query(selectWineShopByWineIdQuery, wineId);
     return selectWineShopByWineIdQueryRow;
 };
 
-exports.selectWineShopByAreaWineList=async function(connection,queryParams){
-    const selectWineShopByAreaWineListQuery=`
-        SELECT shopId,shopName,shopCategory,location,tel
+exports.selectWineShopByAreaWineList = async function (connection, queryParams) {
+    const selectWineShopByAreaWineListQuery = `
+        SELECT shopId, shopName, shopCategory, location, tel
         FROM Shop
-        WHERE location LIKE ? AND shopId IN (select shopId from ShopWine where wineId in ?);
+        WHERE location LIKE ?
+          AND shopId IN (select shopId from ShopWine where wineId in ?);
     `;
-    const [selectWineShopByAreaWineListQueryRow]=await connection.query(selectWineShopByAreaWineListQuery,queryParams);
+    const [selectWineShopByAreaWineListQueryRow] = await connection.query(selectWineShopByAreaWineListQuery, queryParams);
     return selectWineShopByAreaWineListQueryRow;
 };
 
-exports.selectWineShop=async function(connection,shopId){
-    const selectWineShopQuery=`
-        SELECT shopId,status
+exports.selectWineShop = async function (connection, shopId) {
+    const selectWineShopQuery = `
+        SELECT shopId, status
         FROM Shop
-        WHERE shopId=?;
+        WHERE shopId = ?;
     `;
-    const [selectWineShopQueryRow]=await connection.query(selectWineShopQuery,shopId);
+    const [selectWineShopQueryRow] = await connection.query(selectWineShopQuery, shopId);
     return selectWineShopQueryRow;
 };
 
-exports.selectShopWine=async function(connection,userId,shopId){
-    const selectShopWineQuery=`
+exports.selectShopWine = async function (connection, userId, shopId) {
+    const selectShopWineQuery = `
         SELECT wineId,
                wineImg,
                wineName,
@@ -445,12 +470,12 @@ exports.selectShopWine=async function(connection,userId,shopId){
                    WHEN (select status from Subscribe where wineId = Wine.wineId and userId = ?) = "Y"
                        THEN "Y"
                    ELSE "N"
-                   END AS userSubscribeStatus,
+                   END                                                                                AS userSubscribeStatus,
                (select count(subscribeId) from Subscribe where wineId = Wine.wineId and status = "Y") as subscribeCount,
                (select count(reviewId) from Review where wineId = Wine.wineId)
         FROM Wine
-        WHERE wineId IN (select wineId from ShopWine where shopId=?);
+        WHERE wineId IN (select wineId from ShopWine where shopId = ?);
     `;
-    const [selectShopWineQueryRow]=await connection.query(selectShopWineQuery,[userId,shopId]);
+    const [selectShopWineQueryRow] = await connection.query(selectShopWineQuery, [userId, shopId]);
     return selectShopWineQueryRow;
 };
