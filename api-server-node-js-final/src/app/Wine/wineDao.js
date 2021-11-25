@@ -133,7 +133,7 @@ exports.selectWineInfo = async function (connection, wineId) {
 
 exports.selectWineFlavor = async function (connection, wineId) {
     const selectWineFlavorQuery = `
-        SELECT flavor
+        SELECT flavor,flavorImg
         FROM SubFlavorCategory
         WHERE subCategoryId in (SELECT subCategoryId FROM Flavor WHERE wineId = ?);
     `;
@@ -143,7 +143,7 @@ exports.selectWineFlavor = async function (connection, wineId) {
 
 exports.selectPairingFood = async function (connection, wineId) {
     const selectPairingFoodQuery = `
-        SELECT food
+        SELECT food,foodImg
         From FoodCategory
         WHERE foodCategoryId IN (SELECT foodCategoryId FROM FoodPairing WHERE wineId = ?);
     `;
