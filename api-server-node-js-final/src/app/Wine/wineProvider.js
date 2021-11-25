@@ -94,10 +94,21 @@ exports.retrieveWineReviews = async function (wineId) {
     if (wineStatusCheckRes.length < 1 || wineStatusCheckRes[0].status === "DELETED")
         return errResponse(baseResponse.WINE_NOT_EXIST);
 
-    const retrieveWineReviewsRes = await wineDao.selectWineReviews(connection, wineId);
-    console.log("와인 리뷰 조회 결과\n", retrieveWineReviewsRes);
+    const retrieveWineReviewIdRes=await wineDao.selectWineReviewId(connection,wineId);
+
+    const result=[];
+
+    for(let i=0;i<retrieveWineReviewIdRes.length;i++){
+        const reviewId=retrieveWineReviewIdRes[i].reviewId;
+        const retrieveWineReviewsRes = await wineDao.selectWineReviews(connection,reviewId);
+        const reviewTags=await wineDao.selectWineTags(connection,reviewId);
+        const review=retrieveWineReviewsRes[0];
+        const tags=reviewTags;
+        result.push({review:review,tags:tags});
+    }
+    console.log("리뷰 검색 결과",result);
     connection.release();
-    return response(baseResponse.SUCCESS, {wineReviews: retrieveWineReviewsRes});
+    return response(baseResponse.SUCCESS, {wineReviews: result});
 };
 
 exports.retrieveWineListByTheme = async function (userId, theme) {
