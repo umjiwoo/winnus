@@ -47,6 +47,12 @@ exports.retrieveUserSubscribeList=async function(userId){
 exports.retrieveSearchedList=async function(userId){
     const connection = await pool.getConnection(async (conn) => conn);
 
+    const userCheckRes=await userDao.selectUserStatus(connection,userId);
+    if(userCheckRes.length<1)
+        return errResponse(baseResponse.USER_NOT_EXIST);
+    if(userCheckRes[0].status==="DELETED")
+        return errResponse(baseResponse.WITHDRAWAL_ACCOUNT);
+
     const searchedList=await userDao.selectSearchedList(connection,userId);
     connection.release();
     return response(baseResponse.SUCCESS,{searchedList:searchedList});
