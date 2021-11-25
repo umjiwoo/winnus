@@ -123,6 +123,11 @@ exports.postSearchKeyword=async function(req,res){
 
 exports.getUserSearched=async function(req,res){
     const userIdFromJWT=req.verifiedToken.userId;
+    const userCheckRes=await userProvider.userStatusCheck(userIdFromJWT);
+    if(userCheckRes.length<1)
+        return res.send(errResponse(baseResponse.USER_NOT_EXIST));
+    if(userCheckRes[0].status==="DELETED")
+        return res.send(errResponse(baseResponse.WITHDRAWAL_ACCOUNT));
     const getUserSearchedRes=await userProvider.retrieveSearchedList(userIdFromJWT);
     return res.send(getUserSearchedRes);
 };
