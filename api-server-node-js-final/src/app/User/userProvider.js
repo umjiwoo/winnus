@@ -43,3 +43,19 @@ exports.retrieveUserSubscribeList=async function(userId){
     connection.release();
     return response(baseResponse.SUCCESS,subscribeCount.concat({subscribeList:userSubscribeList}));
 };
+
+exports.retrieveSearchedList=async function(userId){
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const searchedList=await userDao.selectSearchedList(connection,userId);
+    connection.release();
+    return response(baseResponse.SUCCESS,{searchedList:searchedList});
+};
+
+exports.retrieveHotSearchedList=async function(){
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const hotSearchedList=await userDao.selectHotSearched(connection);
+    connection.release();
+    return response(baseResponse.SUCCESS,{hotSearchedList:hotSearchedList});
+};

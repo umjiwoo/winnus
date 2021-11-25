@@ -107,3 +107,41 @@ exports.getUserSubscribeList=async function(req,res){
     const userSubscribeListRes=await userProvider.retrieveUserSubscribeList(userIdFromJWT);
     return res.send(userSubscribeListRes);
 };
+
+exports.postSearchKeyword=async function(req,res){
+    const userIdFromJWT=req.verifiedToken.userId;
+
+    const keyword=req.body.keyword;
+
+    if(!keyword)
+        return res.send(errResponse(baseResponse.SEARCH_KEYWORD_EMPTY));
+
+    const postSearchRes=await userService.postSearchKeyword(userIdFromJWT,keyword);
+
+    return res.send(postSearchRes);
+};
+
+exports.getUserSearched=async function(req,res){
+    const userIdFromJWT=req.verifiedToken.userId;
+    const getUserSearchedRes=await userProvider.retrieveSearchedList(userIdFromJWT);
+    return res.send(getUserSearchedRes);
+};
+
+exports.patchSearchedList=async function(req,res){
+    const userIdFromJWT=req.verifiedToken.userId;
+    const searchId=req.query.searchId;
+
+    if(!searchId) {
+        const AllKeywordDeletion=await userService.updateAllSearchedKeyword(userIdFromJWT);
+        return res.send(AllKeywordDeletion);
+    }
+    else{
+        const keywordDeletion=await userService.updateSearchedKeyword(userIdFromJWT,searchId);
+        return res.send(keywordDeletion);
+    }
+};
+
+exports.getHotSearched=async function(req,res){
+    const getHotSearchedRes=await userProvider.retrieveHotSearchedList();
+    return res.send(getHotSearchedRes);
+};

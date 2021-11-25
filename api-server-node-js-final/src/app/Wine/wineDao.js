@@ -151,6 +151,19 @@ exports.selectPairingFood = async function (connection, wineId) {
     return selectPairingFoodQueryRow;
 };
 
+exports.selectPairingFoodList=async function(connection,shopWineList){
+    const selectPairingFoodListQuery=`
+        SELECT food
+        From FoodCategory
+        WHERE foodCategoryId 
+                  IN (SELECT distinct foodCategoryId 
+                        FROM FoodPairing 
+                        WHERE wineId IN (?));
+    `;
+    const [selectPairingFoodListQueryRow]=await connection.query(selectPairingFoodListQuery,shopWineList);
+    return selectPairingFoodListQueryRow;
+};
+
 exports.selectWineReviewLimit3 = async function (connection, wineId) {
     const selectWineReviewLimit3Query = `
         SELECT rating,
@@ -407,4 +420,38 @@ exports.selectWineShopByAreaWineList=async function(connection,queryParams){
     `;
     const [selectWineShopByAreaWineListQueryRow]=await connection.query(selectWineShopByAreaWineListQuery,queryParams);
     return selectWineShopByAreaWineListQueryRow;
+};
+
+exports.selectWineShop=async function(connection,shopId){
+    const selectWineShopQuery=`
+        SELECT shopId,status
+        FROM Shop
+        WHERE shopId=?;
+    `;
+    const [selectWineShopQueryRow]=await connection.query(selectWineShopQuery,shopId);
+    return selectWineShopQueryRow;
+};
+
+exports.selectShopWine=async function(connection,userId,shopId){
+    const selectShopWineQuery=`
+        SELECT wineId,
+               wineImg,
+               wineName,
+               country,
+               region,
+               quantity,
+               price,
+               quantity,
+               CASE
+                   WHEN (select status from Subscribe where wineId = Wine.wineId and userId = ?) = "Y"
+                       THEN "Y"
+                   ELSE "N"
+                   END AS userSubscribeStatus,
+               (select count(subscribeId) from Subscribe where wineId = Wine.wineId and status = "Y") as subscribeCount,
+               (select count(reviewId) from Review where wineId = Wine.wineId)
+        FROM Wine
+        WHERE wineId IN (select wineId from ShopWine where shopId=?);
+    `;
+    const [selectShopWineQueryRow]=await connection.query(selectShopWineQuery,[userId,shopId]);
+    return selectShopWineQueryRow;
 };

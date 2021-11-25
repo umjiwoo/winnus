@@ -336,3 +336,27 @@ exports.retrieveWineShop = async function (wineName, area) {
     connection.release();
     return response(baseResponse.SUCCESS, [{wineShopCount:wineShopCount[0].shopNum}].concat({shopList: retrieveWineShopRes}));
 };
+
+exports.retrieveShopDetail=async function(userId,shopId){
+    const connection = await pool.getConnection(async (conn) => conn);
+    //있는 와인샵 인덱스인지 확인
+    const shopCheck=await wineDao.selectWineShop(connection,shopId);
+    if(shopCheck.length<1||shopCheck.status==="DELETED")
+        return errResponse(baseResponse.NOT_EXIST_SHOP);
+
+    //상점 취급 와인 가져오기
+    const selectShopWine=await wineDao.selectShopWine(connection,userId,shopId);
+
+    //취급 와인 인덱스 리스트
+    const shopWineList=[];
+    for(let i=0;i<selectShopWine.length;i++){
+        shopWineList.push(selectShopWine[i].wineId);
+    }
+
+    //해당 인덱스의 와인들 페어링 푸드 가져오기
+    const selectFoodPairingList=await wineDao.selectPairingFoodList(connection,shopWineList);
+    console.log(selectFoodPairingList);
+
+    connection.release();
+    return response(baseResponse.SUCCESS,[{wineCount:selectShopWine.length}].concat({wineList:selectShopWine}).concat({pairingFoodList:selectFoodPairingList}));
+};
