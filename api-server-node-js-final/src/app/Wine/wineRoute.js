@@ -33,4 +33,7 @@ module.exports = function(app){
 
     //와인 상점 검색
     app.get('/app/shops',jwtMiddleware,wine.getShops);
+
+    //상점 상세 조회 api
+    app.get('/app/shops/:shopId',jwtMiddleware,wine.getShopDetail);
 };

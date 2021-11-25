@@ -1,3 +1,4 @@
+const jwtMiddleware = require("../../../config/jwtMiddleware");
 module.exports = function(app){
     const user = require('./userController');
     const jwtMiddleware = require('../../../config/jwtMiddleware');
@@ -23,4 +24,16 @@ module.exports = function(app){
 
     //와인 찜 조회
     app.get('/app/subscribes',jwtMiddleware,user.getUserSubscribeList);
+
+    //검색어 등록
+    app.post('/app/searched',jwtMiddleware,user.postSearchKeyword);
+
+    //검색어 조회
+    app.get('/app/searched',jwtMiddleware,user.getUserSearched);
+
+    //인기 검색어 조회
+    app.get('/app/searched/hot',jwtMiddleware,user.getHotSearched);
+
+    //검색어 삭제(일부/전체)
+    app.patch('/app/searched',jwtMiddleware,user.patchSearchedList);
 };

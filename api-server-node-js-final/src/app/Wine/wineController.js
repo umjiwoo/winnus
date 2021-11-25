@@ -105,3 +105,12 @@ exports.getShops=async function(req,res){
     }
     return res.send(getShopRes);
 };
+
+exports.getShopDetail=async function(req,res){
+    const userIdFromJWT=req.verifiedToken.userId;
+    const shopId=req.params.shopId;
+    if(!shopId)
+        return res.send(errResponse(baseResponse.ENTER_SHOP_ID_TO_SHOW));
+    const getShopDetailRes=await wineProvider.retrieveShopDetail(userIdFromJWT,shopId);
+    return res.send(getShopDetailRes);
+};

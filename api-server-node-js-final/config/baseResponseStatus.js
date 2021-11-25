@@ -7,6 +7,7 @@ module.exports = {
     POST_REVIEW_SUCCESS:{"isSuccess": true, "code": 1004, "message":"리뷰 작성 성공" },
     SUBSCRIBE_SUCCESS:{"isSuccess": true, "code": 1005, "message":"와인 찜 등록 성공" },
     UNSUBSCRIBE_SUCCESS:{"isSuccess": true, "code": 1005, "message":"와인 찜 해제 성공" },
+    DELETE_ALL_SEARCHED_KEYWORD_SUCCESS:{"isSuccess": true, "code": 1006, "message":"검색 기록 전체 삭제 성공"},
 
     // Common
     TOKEN_EMPTY : { "isSuccess": false, "code": 2000, "message":"JWT 토큰을 입력해주세요." },
@@ -33,13 +34,17 @@ module.exports = {
     SELECT_THEME_TO_GET:{ "isSuccess": false, "code": 2031, "message":"조회할 테마를 선택해주세요."},
 
     ENTER_WINE_NAME:{"isSuccess": false, "code": 2032, "message":"검색할 와인 이름을 입력해주세요."},
-    ENTER_WINE_SEARCH_KEYWORD:{"isSuccess": false, "code": 2032, "message":"검색 키워드를 입력해주세요"},
+    ENTER_WINE_SEARCH_KEYWORD:{"isSuccess": false, "code": 2032, "message":"검색 키워드를 입력해주세요."},
 
     ENTER_WILLING_TO_SUBSCRIBE_WINE_ID:{ "isSuccess": false, "code": 2033, "message":"찜할 와인 인덱스를 입력해주세요."},
 
     TASTE_LIST_EMPTY:{"isSuccess": false, "code": 2034, "message":"맛(당도,산도,바디감,타닌감)은 필수 선택 요소입니다."},
 
     GOTO_WINE_SEARCH:{"isSuccess": false, "code": 2035, "message":"와인 검색 탭에서 검색해주세요."},
+
+    ENTER_SHOP_ID_TO_SHOW:{"isSuccess": false, "code": 2036, "message":"둘러볼 와인샵 인덱스를 입력해주세요."},
+
+    SEARCH_KEYWORD_EMPTY:{"isSuccess": false, "code": 2037, "message": "검색하고자 하는 키워드를 입력하새요."},
 
     // Response error
     ALREADY_SIGN_UP:{"isSuccess": false, "code": 3001, "message":"이미 가입되어 있는 전화번호입니다."},
@@ -67,6 +72,11 @@ module.exports = {
     WINE_SHOP_NOT_EXIST:{"isSuccess": false, "code": 3045, "message":"검색 조건에 맞는 와인샵이 존재하지 않습니다."},
     WINE_SHOP_NOT_EXIST_INCLUDING_THIS_WINE:{"isSuccess": false, "code": 3046, "message":"해당 와인을 보유한 상점이 없습니다."},
     WINE_SEARCH_BY_NAME_NOT_EXIST:{"isSuccess": false, "code": 3047, "message":"해당 와인이 존재하지 않습니다. 와인 이름을 정확히 입력해 주세요."},
+
+    NOT_EXIST_SHOP:{"isSuccess": false, "code": 3048, "message":"등록되지 않았거나 삭제된 와인샵입니다."},
+
+    NOT_LOGIN_USER_SEARCH:{"isSuccess": false, "code": 3039, "message": "로그인 유저가 검색한 키워드 인덱스가 아닙니다."},
+    ALREADY_DELETED_SEARCH_KEYWORD:{"isSuccess": false, "code": 3040, "message": "이미 삭제된 키워드입니다."},
 
     //Connection, Transaction 등의 서버 오류
     DB_ERROR : { "isSuccess": false, "code": 4000, "message": "데이터 베이스 에러"},
