@@ -157,7 +157,7 @@ exports.selectSearchedList=async function(connection,userId){
         SELECT searchId, keyword
         FROM Searched
         WHERE userId = ?
-            AND status = 'REGISTERED' OR status='UPDATED'
+            AND (status = 'REGISTERED' OR status='UPDATED')
         ORDER BY updatedAt DESC
         LIMIT 5;
     `;
