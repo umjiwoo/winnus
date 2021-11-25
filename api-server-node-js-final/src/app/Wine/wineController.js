@@ -51,10 +51,7 @@ exports.getWineListByTheme=async function(req,res){
 };
 
 exports.getWineNames=async function(req,res){
-    const keyword=req.query.keyword;
-    if(!keyword)
-        return res.send(errResponse(baseResponse.ENTER_WINE_SEARCH_KEYWORD));
-    const wineNameListRes=await wineProvider.retrieveWineNamesByKeyword(keyword);
+    const wineNameListRes=await wineProvider.retrieveWineNamesByKeyword();
     return res.send(wineNameListRes);
 };
 

@@ -130,26 +130,9 @@ exports.retrieveWineListByTheme = async function (userId, theme) {
     }
 };
 
-exports.retrieveWineNamesByKeyword = async function (keyword) {
+exports.retrieveWineNamesByKeyword = async function () {
     const connection = await pool.getConnection(async (conn) => conn);
-    const keywordSplitList = keyword.split("");
-    const repeatNum = keywordSplitList.length;
-    //문자 사이사이 와일드카드 삽입
-    for (let i = 0; i < repeatNum; i++) {
-        keywordSplitList.splice(i * 2, 0, "%");
-    }
-    //맨 마지막에 와일드카드 추가해주기
-    keywordSplitList.push("%");
-    //배열 문자열로 합치기
-    //여기서 join.("%")했어도 됨
-    keyword = keywordSplitList.join("");
-
-    const wineNamesRes = await wineDao.selectWineNameByKeyword(connection, keyword);
-    if (wineNamesRes.length < 1)
-        return errResponse(baseResponse.WINE_NOT_EXIST_INCLUDE_THIS_KEYWORD);
-
-    console.log("키워드로 와인 이름 조회\n", wineNamesRes);
-
+    const wineNamesRes = await wineDao.selectWineNames(connection);
     connection.release();
     return response(baseResponse.SUCCESS, {wineNames: wineNamesRes});
 };

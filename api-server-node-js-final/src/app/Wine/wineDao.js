@@ -294,14 +294,13 @@ exports.selectWinesForAutumn = async function (connection, userId) {
     return selectWinesForAutumnQueryRow;
 };
 
-exports.selectWineNameByKeyword = async function (connection, keyword) {
-    const selectWineNameByKeywordQuery = `
+exports.selectWineNames = async function (connection) {
+    const selectWineNamesQuery = `
         SELECT wineName
-        FROM Wine
-        WHERE wineName LIKE ?;
+        FROM Wine;
     `;
-    const [selectWineNameByKeywordQueryRow] = await connection.query(selectWineNameByKeywordQuery, keyword);
-    return selectWineNameByKeywordQueryRow;
+    const [selectWineNamesQueryRow] = await connection.query(selectWineNamesQuery);
+    return selectWineNamesQueryRow;
 };
 
 exports.selectWineByName = async function (connection, userId, keyword) {
