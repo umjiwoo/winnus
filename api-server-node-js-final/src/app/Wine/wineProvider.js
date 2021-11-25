@@ -174,7 +174,7 @@ exports.retrieveWineByName = async function (userId, keyword) {
     return response(baseResponse.SUCCESS, [{wineCount: getWineNum}].concat({retrieveWineRes: retrieveWineRes}));
 };
 
-exports.retrieveWinesByFilter = async function (userId, type, taste, flavors, foods, price) {
+exports.retrieveWinesByFilter = async function (userId, keyword, type, taste, flavors, foods, price) {
     const connection = await pool.getConnection(async (conn) => conn);
 
     let typeList = [];
@@ -183,6 +183,16 @@ exports.retrieveWinesByFilter = async function (userId, type, taste, flavors, fo
     let foodList = [];
     let priceScope = [];
 
+    if(keyword){
+        const keywordSplitList = keyword.split("");
+        const repeatNum = keywordSplitList.length;
+        for (let i = 0; i < repeatNum; i++) {
+            keywordSplitList.splice(i * 2, 0, "%");
+        }
+        keywordSplitList.push("%");
+        keyword = keywordSplitList.join("");
+        console.log("keyword: ",keyword);
+    }
     if (type) {
         typeList = type.split(',');
         for (let i in typeList) {
@@ -219,6 +229,7 @@ exports.retrieveWinesByFilter = async function (userId, type, taste, flavors, fo
         console.log("5-1\n", priceScope);
     }
 
+    let queryParams=[];
 
     let sql = "SELECT distinct w.wineId,w.wineImg,w.wineName,w.price,w.quantity,w.country,w.region," +
         "CASE WHEN (select status from Subscribe where wineId = w.wineId and userId = ?) = 'Y' THEN 'Y' ELSE 'N' END AS userSubscribeStatus," +
@@ -226,10 +237,15 @@ exports.retrieveWinesByFilter = async function (userId, type, taste, flavors, fo
         "(select count(reviewId) from Review where wineId=w.wineId) as reviewCount," +
         "sweetness,acidity,body,tannin ";
     sql += "FROM Wine w,Flavor f,FoodPairing fp ";
-    sql += "WHERE (sweetness=? and acidity=? and body=? and tannin=?)";
 
-
-    let queryParams = [userId, tasteList[0], tasteList[1], tasteList[2], tasteList[3]];
+    if(keyword){
+        sql+="WHERE (w.wineName like ?) and (sweetness=? and acidity=? and body=? and tannin=?)";
+        queryParams=[userId, keyword, tasteList[0], tasteList[1], tasteList[2], tasteList[3]];
+    }
+    else {
+        sql += "WHERE (sweetness=? and acidity=? and body=? and tannin=?)";
+        queryParams=[userId, tasteList[0], tasteList[1], tasteList[2], tasteList[3]];
+    }
 
     if (type) {
         sql += " and (w.type in (?))";
