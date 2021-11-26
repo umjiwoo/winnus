@@ -153,7 +153,7 @@ exports.selectPairingFood = async function (connection, wineId) {
 
 exports.selectPairingFoodList = async function (connection, shopWineIdList) {
     const selectPairingFoodListQuery = `
-        SELECT food
+        SELECT foodCategoryId,food,foodImg
         From FoodCategory
         WHERE foodCategoryId
                   IN (SELECT foodCategoryId
