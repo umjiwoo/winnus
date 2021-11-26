@@ -46,6 +46,8 @@ module.exports = {
 
     SEARCH_KEYWORD_EMPTY:{"isSuccess": false, "code": 2037, "message": "검색하고자 하는 키워드를 입력하새요."},
 
+    NOT_LOGIN_USER_ID:{"isSuccess": false, "code": 2038, "message": "로그인 유저의 인덱스가 아닙니다."},
+
     // Response error
     ALREADY_SIGN_UP:{"isSuccess": false, "code": 3001, "message":"이미 가입되어 있는 전화번호입니다."},
     NICKNAME_ALREADY_EXIST:{"isSuccess": false, "code": 3002, "message":"이미 사용중인 닉네임입니다."},

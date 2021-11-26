@@ -18,6 +18,9 @@ module.exports = function(app){
 
     //리뷰 작성
     app.post('/app/reviews',jwtMiddleware,user.postReview);
+    //사용자 리뷰 조회
+    app.get('/app/users/reviews/:userId',jwtMiddleware,user.getUserReviews);
+
 
     //와인 찜 등록
     app.post('/app/subscribes',jwtMiddleware,user.postSubscribe);

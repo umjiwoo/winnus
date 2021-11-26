@@ -205,3 +205,13 @@ exports.selectHotSearched=async function(connection){
     const [selectHotSearchedQueryRow]=await connection.query(selectHotSearchedQuery);
     return selectHotSearchedQueryRow;
 };
+
+exports.selectUserReviewIds=async function(connection,userId){
+    const selectUserReviewsQuery=`
+        SELECT reviewId
+        FROM Review
+        WHERE userId=? AND status!="DELETED";
+    `;
+    const [selectUserReviewsQueryRow]=await connection.query(selectUserReviewsQuery,userId);
+    return selectUserReviewsQueryRow;
+};
