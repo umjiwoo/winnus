@@ -153,7 +153,7 @@ exports.selectPairingFood = async function (connection, wineId) {
 
 exports.selectPairingFoodList = async function (connection, shopWineIdList) {
     const selectPairingFoodListQuery = `
-        SELECT foodCategoryId,food,foodImg
+        SELECT foodCategoryId, food, foodImg
         From FoodCategory
         WHERE foodCategoryId
                   IN (SELECT foodCategoryId
@@ -171,7 +171,8 @@ exports.selectWineReviewLimit3 = async function (connection, wineId) {
                (select DATE_FORMAT(createdAt, '%Y.%m.%d'))              as createdAt,
                (select nickname from User where userId = Review.userId) as userName
         FROM Review
-        WHERE wineId = ? AND status!="DELETED"
+        WHERE wineId = ?
+          AND status!="DELETED"
         ORDER BY createdAt DESC LIMIT 3;
     `;
     const [selectWineReviewLimit3QueryRow] = await connection.query(selectWineReviewLimit3Query, wineId);
@@ -218,7 +219,8 @@ exports.selectWineReviewId = async function (connection, wineId) {
     const selectWineReviewIdQuery = `
         SELECT reviewId
         FROM Review
-        WHERE wineId = ? AND status!="DELETED";
+        WHERE wineId = ?
+          AND status!="DELETED";
     `;
     const [selectWineReviewIdQueryRow] = await connection.query(selectWineReviewIdQuery, wineId);
     return selectWineReviewIdQueryRow;
@@ -228,32 +230,40 @@ exports.selectWineTags = async function (connection, reviewId) {
     const selectWineTagsQuery = `
         SELECT content
         FROM Tag
-        WHERE tagId IN (select tagId from Tag where reviewId = ?) AND status!="DELETED";
+        WHERE tagId IN (select tagId from Tag where reviewId = ?)
+          AND status!="DELETED";
     `;
     const [selectWineTagsQueryRow] = await connection.query(selectWineTagsQuery, reviewId);
     return selectWineTagsQueryRow;
 };
 
-exports.selectWineTagIds=async function(connection,reviewId){
-    const selectWineTagIdsQuery=`
+exports.selectWineTagIds = async function (connection, reviewId) {
+    const selectWineTagIdsQuery = `
         SELECT tagId
         FROM Tag
-        WHERE tagId IN (select tagId from Tag where reviewId = ?) AND status!="DELETED";
+        WHERE tagId IN (select tagId from Tag where reviewId = ?)
+          AND status!="DELETED";
     `;
-    const [selectWineTagIdsQueryRow]=await connection.query(selectWineTagIdsQuery,reviewId);
+    const [selectWineTagIdsQueryRow] = await connection.query(selectWineTagIdsQuery, reviewId);
     return selectWineTagIdsQueryRow;
 };
 
 
 exports.selectWineReviews = async function (connection, reviewId) {
     const selectWineReviewsQuery = `
-        SELECT reviewId,
+        SELECT (select wineId from Wine where wineId = Review.wineId)   as wineId,
+               (select wineImg from Wine where wineId = Review.wineId)  as wineImg,
+               (select wineName from Wine where wineId = Review.wineId) as wineName,
+               (select country from Wine where wineId = Review.wineId)  as country,
+               (select region from Wine where wineId = Review.wineId)   as region,
+               reviewId,
                rating,
                content,
                (select DATE_FORMAT(createdAt, '%Y.%m.%d'))              as createdAt,
                (select nickname from User where userId = Review.userId) as userName
         FROM Review
-        WHERE reviewId = ?;
+        WHERE reviewId = ?
+          AND Review.status!="DELETED";
     `;
     const [selectWineReviewsQueryRow] = await connection.query(selectWineReviewsQuery, reviewId);
     return selectWineReviewsQueryRow;
@@ -480,9 +490,9 @@ exports.selectShopWine = async function (connection, userId, shopId) {
                    WHEN (select status from Subscribe where wineId = Wine.wineId and userId = ?) = "Y"
                        THEN "Y"
                    ELSE "N"
-                   END AS userSubscribeStatus,
+                   END                                                                                AS userSubscribeStatus,
                (select count(subscribeId) from Subscribe where wineId = Wine.wineId and status = "Y") as subscribeCount,
-               (select count(reviewId) from Review where wineId = Wine.wineId) as reviewCount
+               (select count(reviewId) from Review where wineId = Wine.wineId)                        as reviewCount
         FROM Wine
         WHERE wineId IN (select wineId from ShopWine where shopId = ?);
     `;
