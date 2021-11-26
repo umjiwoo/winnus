@@ -2,6 +2,7 @@ const { pool } = require("../../../config/database");
 const { logger } = require("../../../config/winston");
 
 const userDao = require("./userDao");
+const wineDao=require("../Wine/wineDao");
 
 const {response,errResponse} = require("../../../config/response");
 const baseResponse = require("../../../config/baseResponseStatus");
@@ -64,4 +65,31 @@ exports.retrieveHotSearchedList=async function(){
     const hotSearchedList=await userDao.selectHotSearched(connection);
     connection.release();
     return response(baseResponse.SUCCESS,{hotSearchedList:hotSearchedList});
+};
+
+exports.retrieveUserReviews=async function(userId){
+    const connection = await pool.getConnection(async (conn) => conn);
+    //유효한 유저 인덱스인지 확인
+    const userCheck=await userDao.selectUserStatus(connection,userId);
+    if(userCheck.length<1)
+        return errResponse(baseResponse.USER_NOT_EXIST);
+    if(userCheck[0].status==="DELETED")
+        return errResponse(baseResponse.WITHDRAWAL_ACCOUNT);
+
+    const userReviews=[];
+
+    const userReviewIds=await userDao.selectUserReviewIds(connection,userId);
+    for(let i=0;i<userReviewIds.length;i++){
+        const reviewId=userReviewIds[i].reviewId;
+        const userReview=await wineDao.selectWineReviews(connection,reviewId);
+        const reviewTags=await wineDao.selectWineTags(connection,reviewId);
+        const review=userReview[0];
+        const tags=reviewTags;
+        userReviews.push({review:review,tags:tags});
+    }
+
+    console.log(`${userId}번 유저 리뷰 조회 결과\n`,userReviews);
+
+    connection.release();
+    return response(baseResponse.SUCCESS,{userReviews:userReviews});
 };

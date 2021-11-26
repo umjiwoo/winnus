@@ -146,3 +146,12 @@ exports.getHotSearched=async function(req,res){
     const getHotSearchedRes=await userProvider.retrieveHotSearchedList();
     return res.send(getHotSearchedRes);
 };
+
+exports.getUserReviews=async function(req,res){
+    const userIdFromJWT=req.verifiedToken.userId;
+    const userId=req.params.userId;
+    if(userIdFromJWT!=userId)
+        return res.send(errResponse(baseResponse.NOT_LOGIN_USER_ID));
+    const userReviewsRes=await userProvider.retrieveUserReviews(userIdFromJWT);
+    return res.send(userReviewsRes);
+};

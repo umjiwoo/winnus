@@ -171,7 +171,7 @@ exports.selectWineReviewLimit3 = async function (connection, wineId) {
                (select DATE_FORMAT(createdAt, '%Y.%m.%d'))              as createdAt,
                (select nickname from User where userId = Review.userId) as userName
         FROM Review
-        WHERE wineId = ?
+        WHERE wineId = ? AND status!="DELETED"
         ORDER BY createdAt DESC LIMIT 3;
     `;
     const [selectWineReviewLimit3QueryRow] = await connection.query(selectWineReviewLimit3Query, wineId);
@@ -218,7 +218,7 @@ exports.selectWineReviewId = async function (connection, wineId) {
     const selectWineReviewIdQuery = `
         SELECT reviewId
         FROM Review
-        WHERE wineId = ?;
+        WHERE wineId = ? AND status!="DELETED";
     `;
     const [selectWineReviewIdQueryRow] = await connection.query(selectWineReviewIdQuery, wineId);
     return selectWineReviewIdQueryRow;
