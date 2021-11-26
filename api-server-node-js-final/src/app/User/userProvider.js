@@ -88,8 +88,8 @@ exports.retrieveUserReviews=async function(userId){
         userReviews.push({review:review,tags:tags});
     }
 
-    console.log(`${userId}번 유저 리뷰 조회 결과\n`,userReviews);
+    console.log(`${userId}번 유저 리뷰 조회 결과\n`,{reviewNum:userReviews.length,userReviews});
 
     connection.release();
-    return response(baseResponse.SUCCESS,{userReviews:userReviews});
+    return response(baseResponse.SUCCESS,[{reviewNum:userReviews.length}].concat({userReviews:userReviews}));
 };
