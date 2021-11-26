@@ -20,7 +20,8 @@ module.exports = function(app){
     app.post('/app/reviews',jwtMiddleware,user.postReview);
     //사용자 리뷰 조회
     app.get('/app/users/reviews/:userId',jwtMiddleware,user.getUserReviews);
-
+    //리뷰 수정
+    app.patch('/app/reviews/:reviewId',jwtMiddleware,user.updateReview);
 
     //와인 찜 등록
     app.post('/app/subscribes',jwtMiddleware,user.postSubscribe);

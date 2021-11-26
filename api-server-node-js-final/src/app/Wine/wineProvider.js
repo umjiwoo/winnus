@@ -42,7 +42,7 @@ exports.retrieveTodayWineList = async function (userId) {
     const todayWineList = [];
     for (let i = 0; i < wineIdxList.length; i++) {
         const wineIdx = wineIdxList[i];
-        const wineRes = await wineDao.selectTodayWines(connection, userId, wineIdx);
+        const wineRes = await wineDao.selectSimpleWineInfo(connection, userId, wineIdx);
         console.log(wineRes);
         todayWineList.push(wineRes);
     }
@@ -355,18 +355,27 @@ exports.retrieveShopDetail=async function(userId,shopId){
         return errResponse(baseResponse.NOT_EXIST_SHOP);
 
     //상점 취급 와인 가져오기
-    const selectShopWine=await wineDao.selectShopWine(connection,userId,shopId);
+    const selectShopWines=await wineDao.selectShopWine(connection,userId,shopId);
+
+    if(selectShopWines.length<1)
+        return errResponse(baseResponse.SHOP_WINE_NOT_EXIST);
 
     //취급 와인 인덱스 리스트
-    const shopWineList=[];
-    for(let i=0;i<selectShopWine.length;i++){
-        shopWineList.push(selectShopWine[i].wineId);
+    const shopWineIdList=[];
+    for(let i=0;i<selectShopWines.length;i++){
+        shopWineIdList.push(selectShopWines[i].wineId);
     }
+    console.log(shopWineIdList);
+
+    // for(let i=0;i<shopWineIdList.length;i++){
+    //     const wineId=shopWineIdList[i];
+    //     const wineInfoRes=await wineDao.selectSimpleWineInfo(connection,userId,wineId);
+    // }
 
     //해당 인덱스의 와인들 페어링 푸드 가져오기
-    const selectFoodPairingList=await wineDao.selectPairingFoodList(connection,shopWineList);
+    const selectFoodPairingList=await wineDao.selectPairingFoodList(connection,shopWineIdList);
     console.log(selectFoodPairingList);
 
     connection.release();
-    return response(baseResponse.SUCCESS,[{wineCount:selectShopWine.length}].concat({wineList:selectShopWine}).concat({pairingFoodList:selectFoodPairingList}));
+    return response(baseResponse.SUCCESS,[{wineCount:selectShopWines.length}].concat({wineList:selectShopWines}).concat({pairingFoodList:selectFoodPairingList}));
 };

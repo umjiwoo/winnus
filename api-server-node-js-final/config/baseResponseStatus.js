@@ -48,6 +48,8 @@ module.exports = {
 
     NOT_LOGIN_USER_ID:{"isSuccess": false, "code": 2038, "message": "로그인 유저의 인덱스가 아닙니다."},
 
+    ENTER_REIVEW_ID_TO_UPDATE:{"isSuccess": false, "code": 2039, "message": "수정할 리뷰 인덱스를 입력해주세요."},
+
     // Response error
     ALREADY_SIGN_UP:{"isSuccess": false, "code": 3001, "message":"이미 가입되어 있는 전화번호입니다."},
     NICKNAME_ALREADY_EXIST:{"isSuccess": false, "code": 3002, "message":"이미 사용중인 닉네임입니다."},
@@ -79,6 +81,11 @@ module.exports = {
 
     NOT_LOGIN_USER_SEARCH:{"isSuccess": false, "code": 3039, "message": "로그인 유저가 검색한 키워드 인덱스가 아닙니다."},
     ALREADY_DELETED_SEARCH_KEYWORD:{"isSuccess": false, "code": 3040, "message": "이미 삭제된 키워드입니다."},
+
+    REVIEW_NOT_EXIST:{"isSuccess": false, "code": 3041, "message": "해당 인덱스의 리뷰가 존재하지 않거나 로그인 유저의 리뷰가 아닙니다."},
+    DELETED_REVIEW:{"isSuccess": false, "code": 3042, "message": "삭제된 리뷰 인덱스 입니다."},
+
+    SHOP_WINE_NOT_EXIST:{"isSuccess": false, "code": 3043, "message": "데이터 베이스의 와인 중 해당 와인샵에서 취급하는 와인이 존재하지 않습니다."},
 
     //Connection, Transaction 등의 서버 오류
     DB_ERROR : { "isSuccess": false, "code": 4000, "message": "데이터 베이스 에러"},
