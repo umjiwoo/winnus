@@ -150,8 +150,28 @@ exports.getHotSearched=async function(req,res){
 exports.getUserReviews=async function(req,res){
     const userIdFromJWT=req.verifiedToken.userId;
     const userId=req.params.userId;
+
     if(userIdFromJWT!=userId)
         return res.send(errResponse(baseResponse.NOT_LOGIN_USER_ID));
     const userReviewsRes=await userProvider.retrieveUserReviews(userIdFromJWT);
     return res.send(userReviewsRes);
+};
+
+exports.updateReview=async function(req,res){
+    const userIdFromJWT=req.verifiedToken.userId;
+    const reviewId=req.params.reviewId;
+    const {rating,content,tagList}=req.body;
+
+    if(!reviewId)
+        return res.send(errResponse(baseResponse.ENTER_REIVEW_ID_TO_UPDATE));
+
+    if(!rating)
+        return res.send(errResponse(baseResponse.RATING_NULL));
+    if(!content)
+        return res.send(errResponse(baseResponse.REVIEW_CONTENT_NULL));
+    if(content.length<20)
+        return res.send(errResponse(baseResponse.REVIEW_CONTENT_LENGTH_WRONG));
+
+    const updateReviewRes=await userService.updateReview(userIdFromJWT,reviewId,rating,content,tagList);
+    return res.send(updateReviewRes);
 };

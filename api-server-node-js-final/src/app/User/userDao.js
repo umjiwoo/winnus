@@ -215,3 +215,29 @@ exports.selectUserReviewIds=async function(connection,userId){
     const [selectUserReviewsQueryRow]=await connection.query(selectUserReviewsQuery,userId);
     return selectUserReviewsQueryRow;
 };
+
+exports.selectReviewUserCheck=async function(connection,userId,reviewId){
+   const selectReviewUserCheckQuery=`
+        SELECT status
+        FROM Review
+        WHERE userId=? AND reviewId=?;
+   `;
+   const [selectReviewUserCheckQueryRow]=await connection.query(selectReviewUserCheckQuery,[userId,reviewId]);
+   return selectReviewUserCheckQueryRow;
+};
+
+exports.updateUserReview=async function(connection,reviewUpdateArgs){
+    const updateUserReviewQuery=`
+        UPDATE Review SET rating=?,content=? WHERE reviewId=?;
+    `;
+    const updateUserReviewQueryRow=await connection.query(updateUserReviewQuery,reviewUpdateArgs);
+    return updateUserReviewQueryRow;
+};
+
+exports.updateReviewTags=async function(connection,tagId){
+    const updateReviewTagsQuery=`
+        UPDATE Tag SET status="DELETED" WHERE tagId=?;
+    `;
+    const updateReviewTagsQueryRow=await connection.query(updateReviewTagsQuery,tagId);
+    return updateReviewTagsQueryRow;
+};

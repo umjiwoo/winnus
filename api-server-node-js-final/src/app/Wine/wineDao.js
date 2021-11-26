@@ -35,7 +35,7 @@ exports.selectWineList = async function (connection, userId) {
     return selectWineListQueryRow;
 };
 
-exports.selectTodayWines = async function (connection, userId, wineIdx) {
+exports.selectSimpleWineInfo = async function (connection, userId, wineIdx) {
     const selectTodayWinesQuery = `
         SELECT wineId,
                wineImg,
@@ -151,16 +151,16 @@ exports.selectPairingFood = async function (connection, wineId) {
     return selectPairingFoodQueryRow;
 };
 
-exports.selectPairingFoodList = async function (connection, shopWineList) {
+exports.selectPairingFoodList = async function (connection, shopWineIdList) {
     const selectPairingFoodListQuery = `
         SELECT food
         From FoodCategory
         WHERE foodCategoryId
-                  IN (SELECT distinct foodCategoryId
+                  IN (SELECT foodCategoryId
                       FROM FoodPairing
                       WHERE wineId IN (?));
     `;
-    const [selectPairingFoodListQueryRow] = await connection.query(selectPairingFoodListQuery, shopWineList);
+    const [selectPairingFoodListQueryRow] = await connection.query(selectPairingFoodListQuery, [shopWineIdList]);
     return selectPairingFoodListQueryRow;
 };
 
@@ -228,10 +228,20 @@ exports.selectWineTags = async function (connection, reviewId) {
     const selectWineTagsQuery = `
         SELECT content
         FROM Tag
-        WHERE tagId IN (select tagId from Tag where reviewId = ?);
+        WHERE tagId IN (select tagId from Tag where reviewId = ?) AND status!="DELETED";
     `;
     const [selectWineTagsQueryRow] = await connection.query(selectWineTagsQuery, reviewId);
     return selectWineTagsQueryRow;
+};
+
+exports.selectWineTagIds=async function(connection,reviewId){
+    const selectWineTagIdsQuery=`
+        SELECT tagId
+        FROM Tag
+        WHERE tagId IN (select tagId from Tag where reviewId = ?) AND status!="DELETED";
+    `;
+    const [selectWineTagIdsQueryRow]=await connection.query(selectWineTagIdsQuery,reviewId);
+    return selectWineTagIdsQueryRow;
 };
 
 
@@ -470,9 +480,9 @@ exports.selectShopWine = async function (connection, userId, shopId) {
                    WHEN (select status from Subscribe where wineId = Wine.wineId and userId = ?) = "Y"
                        THEN "Y"
                    ELSE "N"
-                   END                                                                                AS userSubscribeStatus,
+                   END AS userSubscribeStatus,
                (select count(subscribeId) from Subscribe where wineId = Wine.wineId and status = "Y") as subscribeCount,
-               (select count(reviewId) from Review where wineId = Wine.wineId)
+               (select count(reviewId) from Review where wineId = Wine.wineId) as reviewCount
         FROM Wine
         WHERE wineId IN (select wineId from ShopWine where shopId = ?);
     `;

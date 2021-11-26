@@ -4,6 +4,7 @@ const secret_config = require("../../../config/secret");
 const userProvider = require("./userProvider");
 const userDao = require("./userDao");
 const wineProvider = require("../Wine/wineProvider");
+const wineDao=require("../Wine/wineDao");
 const baseResponse = require("../../../config/baseResponseStatus");
 const {response} = require("../../../config/response");
 const {errResponse} = require("../../../config/response");
@@ -298,6 +299,80 @@ exports.updateSearchedKeyword = async function (userId, searchId) {
         await connection.rollback();
         return errResponse(baseResponse.DB_ERROR);
     } finally {
+        connection.release();
+    }
+};
+
+exports.updateReview=async function(userIdFromJWT,reviewId,rating,content,tagList){
+    const connection = await pool.getConnection(async (conn) => conn);
+    try{
+        await connection.beginTransaction();
+        //로그인 유저의 리뷰가 맞는 지 확인
+        const reviewUserCheck=await userDao.selectReviewUserCheck(connection,userIdFromJWT,reviewId);
+        if(reviewUserCheck.length<1)
+            return errResponse(baseResponse.REVIEW_NOT_EXIST);
+        if(reviewUserCheck[0].status==="DELETED")
+            return errResponse(baseResponse.DELETED_REVIEW);
+
+        const reviewUpdateArgs=[rating,content,reviewId];
+        const updateReviewRes=await userDao.updateUserReview(connection,reviewUpdateArgs);
+        console.log(updateReviewRes[0].changedRows);
+
+        if(tagList){
+            console.log("tagList수정 진입");
+            // const reviewTagIds=await wineDao.selectWineTagIds(connection,reviewId);
+            // console.log(reviewTagIds.length);
+            // if(reviewTagIds.length>0){
+            //     for(let i=0;i<reviewTagIds.length;i++) { //기존에 있던 태그들 status값 "DELETED로 변경해줌"
+            //         const tagId = reviewTagIds[i].tagId;
+            //         const updateTagStatus=await userDao.updateReviewTags(connection,tagId);
+            //     }
+            // }
+            // for(let i=0;i<tagList.length;i++){ //수정 시 들어온 태그들 전부 다시 삽입
+            //     const tagContent = tagList[i].tag;
+            //     const insertTagRes = await userDao.insertTag(connection, reviewId, userIdFromJWT, tagContent);
+            // }
+            const reviewTags=await wineDao.selectWineTags(connection,reviewId);
+            const reviewTagIds=await wineDao.selectWineTagIds(connection,reviewId);
+            const tags=[];
+            const tagIds=[];
+            for(let i=0;i<reviewTags.length;i++){
+                tags.push(reviewTags[i].content);
+                tagIds.push(reviewTagIds[i].tagId);
+            }
+            console.log("tags:",tags);
+            console.log("tagIds:",tagIds);
+            for(let i=0;i<tagList.length;i++){
+                const tagContent=tagList[i].tag;
+                if(tags.includes(tagContent)){
+                    const popId=tags.indexOf(tagContent);
+                    tags.splice(popId,1);
+                    tagIds.splice(popId,1);
+                }
+                else{
+                    console.log("tag insert...");
+                    const insertTagRes = await userDao.insertTag(connection, reviewId, userIdFromJWT, tagContent);
+                }
+            }
+            console.log("tags-after:",tags);
+            console.log("tagIds-after:",tagIds);
+            if(tagIds.length>0) {
+                for (let i = 0; i < tagIds.length; i++) {
+                    const tagId = tagIds[i];
+                    const updateTagStatus = await userDao.updateReviewTags(connection, tagId);
+                }
+            }
+        }
+
+        await connection.commit();
+        return response(baseResponse.SUCCESS)
+    }
+    catch(err){
+        logger.error(`App - updateReview Service error\n: ${err.message}`);
+        await connection.rollback();
+        return errResponse(baseResponse.DB_ERROR);
+    }
+    finally{
         connection.release();
     }
 };
