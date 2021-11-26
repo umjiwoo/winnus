@@ -103,6 +103,10 @@ exports.getShops=async function(req,res){
     return res.send(getShopRes);
 };
 
+// exports.getShopMain=async function(req,res){
+//
+// };TODO 와인샵 메인 정보 내보내기
+
 exports.getShopDetail=async function(req,res){
     const userIdFromJWT=req.verifiedToken.userId;
     const shopId=req.params.shopId;
