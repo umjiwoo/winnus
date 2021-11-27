@@ -11,6 +11,12 @@ module.exports = function(app){
     //인증번호 확인 api
     app.post('/app/verifications/verify',user.verify);
 
+    //유저 정보 조회 api
+    app.get('/app/users/:userId',jwtMiddleware,user.getUserInfo);
+
+    //유저 정보 수정 api
+    app.patch('/app/users/:userId',jwtMiddleware,user.updateUserInfo);
+
     //로그인 api
     app.post('/app/login',user.login);
     //자동 로그인 api

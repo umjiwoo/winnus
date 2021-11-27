@@ -195,11 +195,12 @@ exports.selectSimilarWineList = async function (connection, sweetness, acidity, 
     const selectSimilarWineListQuery = `
         SELECT wineId, wineImg, wineName, price, country, region
         FROM Wine
-        WHERE sweetness = ?
+        WHERE (sweetness = ?
           AND acidity = ?
           AND body = ?
-          AND tannin = ?
-            NOT IN (?);
+          AND tannin = ?)
+        NOT IN (?)
+        LIMIT 4;
     `;
     const [selectSimilarWineListQueryRow] = await connection.query(selectSimilarWineListQuery, [sweetness, acidity, body, tannin, wineId]);
     return selectSimilarWineListQueryRow;
@@ -418,7 +419,7 @@ exports.selectCountWineShop = async function (connection, queryParams) {
 
 exports.selectAllWineShop = async function (connection) {
     const selectWineShopQuery = `
-        SELECT shopId, shopName, shopCategory, location, tel
+        SELECT shopId, shopImg, shopName, shopCategory, location, tel
         FROM Shop;
     `;
     const [selectWineShopQueryRow] = await connection.query(selectWineShopQuery);
@@ -427,7 +428,7 @@ exports.selectAllWineShop = async function (connection) {
 
 exports.selectWineShopByArea = async function (connection, area) {
     const selectWineShopByAreaQuery = `
-        SELECT shopId, shopName, shopCategory, location, tel
+        SELECT shopId, shopImg, shopName, shopCategory, location, tel
         FROM Shop
         WHERE location LIKE ?;
     `;
@@ -457,7 +458,7 @@ exports.selectWineShopByWineId = async function (connection, wineId) {
 
 exports.selectWineShopByAreaWineList = async function (connection, queryParams) {
     const selectWineShopByAreaWineListQuery = `
-        SELECT shopId, shopName, shopCategory, location, tel
+        SELECT shopId, shopImg, shopName, shopCategory, location, tel
         FROM Shop
         WHERE location LIKE ?
           AND shopId IN (select shopId from ShopWine where wineId in ?);

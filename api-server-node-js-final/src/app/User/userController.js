@@ -30,6 +30,18 @@ exports.postUser=async function(req,res){
    return res.send(signUpRes);
 };
 
+exports.getUserInfo=async function(req,res){
+    const userIdFromJWT=req.verifiedToken.userId;
+    const userInfoRes=await userProvider.retrieveUserInfo(userIdFromJWT);
+    return res.send(userInfoRes);
+};
+
+exports.updateUserInfo=async function(req,res){
+    const userIdFromJWT=req.verifiedToken.userId;
+    const {profileImg,nickname,pwd}=req.body;
+    //TODO 유저 정보 수정
+};
+
 exports.postVerification=async function(req,res){
     const phoneNum=req.body.phoneNum;
 

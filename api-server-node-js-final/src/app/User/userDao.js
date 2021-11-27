@@ -38,6 +38,17 @@ exports.insertUser=async function(connection,nickname,phoneNum,pwd){
     return insertUserQueryRow[0];
 };
 
+exports.selectUserInfo=async function(connection,userId){
+    const selectUserInfoQuery=`
+        SELECT nickname,profileImg,phoneNum
+        FROM User
+        WHERE userId=?;
+    `;
+    const [selectUserInfoQueryRow]=await connection.query(selectUserInfoQuery,userId);
+    return selectUserInfoQueryRow;
+};
+
+
 exports.insertReview=async function(connection,wineId,userId,rating,content){
     const insertReviewQuery=`
         INSERT INTO Review VALUES (null,?,?,?,?,default,default,default);
@@ -80,7 +91,7 @@ exports.updateSubscribeStatus=async function(connection,subscribeId,status){
 
 exports.selectSubscribeCount=async function(connection,userId){
     const selectSubscribeCountQuery=`
-        SELECT count(subscribeId) as subscribeNum FROM Subscribe WHERE userId=?;
+        SELECT count(subscribeId) as subscribeNum FROM Subscribe WHERE userId=? and status="Y";
     `;
     const [selectSubscribeCountQueryRow]=await connection.query(selectSubscribeCountQuery,userId);
     return selectSubscribeCountQueryRow;
@@ -89,12 +100,17 @@ exports.selectSubscribeCount=async function(connection,userId){
 exports.selectUserSubscribeList=async function(connection,userId){
     const selectUserSubscribeListQuery=`
         SELECT wineId,wineImg,wineName,country,region,quantity,price,
-               (select count(subscribeId) from Subscribe where wineId=Wine.wineId and status="Y") as subscribeCount,
-               (select count(reviewId) from Review where wineId=Wine.wineId) as reviewCount
+               CASE
+                   WHEN (select status from Subscribe where wineId = Wine.wineId and userId = ?) = "Y"
+                       THEN "Y"
+                   ELSE "N"
+                   END AS userSubscribeStatus,
+               (select count(subscribeId) from Subscribe where Subscribe.status="Y" and wineId=Wine.wineId) as subscribeCount,
+               (select count(reviewId) from Review where Review.status="REGISTERED" and wineId=Wine.wineId) as reviewCount
         FROM Wine
         WHERE wineId IN (select wineId from Subscribe where userId=? and status="Y");
     `;
-    const [selectUserSubscribeListQueryRow]=await connection.query(selectUserSubscribeListQuery,userId);
+    const [selectUserSubscribeListQueryRow]=await connection.query(selectUserSubscribeListQuery,[userId,userId]);
     return selectUserSubscribeListQueryRow;
 };
 
