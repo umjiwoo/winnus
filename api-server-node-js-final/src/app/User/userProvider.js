@@ -37,6 +37,13 @@ exports.userStatusCheck=async function(userId){
     return userStatusCheckRes;
 };
 
+exports.retrieveUserInfo=async function(userId){
+    const connection=await pool.getConnection(async (conn) => conn);
+    const userInfoRes=await userDao.selectUserInfo(connection,userId);
+    connection.release();
+    return response(baseResponse.SUCCESS,userInfoRes);
+};
+
 exports.retrieveUserSubscribeList=async function(userId){
     const connection=await pool.getConnection(async (conn) => conn);
     const subscribeCount=await userDao.selectSubscribeCount(connection,userId);
@@ -91,5 +98,5 @@ exports.retrieveUserReviews=async function(userId){
     console.log(`${userId}번 유저 리뷰 조회 결과\n`,userReviews);
 
     connection.release();
-    return response(baseResponse.SUCCESS,{userReviews:userReviews});
+    return response(baseResponse.SUCCESS,[{reviewNum:userReviews.length}].concat({userReviews:userReviews}));
 };
