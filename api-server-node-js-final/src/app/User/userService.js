@@ -95,6 +95,25 @@ exports.postVerification = async function (phoneNum, verifyNum) {
     }
 };
 
+
+exports.updateUserStatus=async function(userId){
+    try {
+        const connection = await pool.getConnection(async (conn) => conn);
+
+        const userCheckRes=await userProvider.userStatusCheck(userId);
+        if(userCheckRes[0].status==="DELETED")
+            return errResponse(baseResponse.ALREADY_WITHDRAWN_USER);
+
+        const updateUserStatusRes = await userDao.updateUserStatus(connection, userId);
+        connection.release();
+        return response(baseResponse.USER_WITHDRAW_SUCCESS);
+    }
+    catch(err){
+        logger.error(`App - withdrawUser Service error\n: ${err.message}`);
+        return errResponse(baseResponse.DB_ERROR);
+    }
+};
+
 exports.postSignIn = async function (phoneNum, pwd) {
     try {
         const userCheck = await userProvider.phoneNumCheck(phoneNum);
@@ -374,5 +393,58 @@ exports.updateReview=async function(userIdFromJWT,reviewId,rating,content,tagLis
     }
     finally{
         connection.release();
+    }
+};
+
+exports.updateUserInfo=async function(userId, profileImg,nickname){
+    try {
+        const connection = await pool.getConnection(async (conn) => conn);
+
+        //유효한 유저인지 확인
+        const userCheckRes=await userProvider.userStatusCheck(userId);
+        if(userCheckRes[0].status==="DELETED")
+            return errResponse(baseResponse.WITHDRAWAL_ACCOUNT);
+
+        const updateUserInfoRes=await userDao.updateUserInfo(connection,profileImg,nickname,userId);
+        console.log(`${userId}번 유저 정보 변경 성공`);
+        connection.release();
+        return response(baseResponse.UPDATE_USER_INFO_SUCCESS);
+    }
+    catch(err){
+        logger.error(`App - updateUserInfo Service error\n: ${err.message}`);
+        return errResponse(baseResponse.DB_ERROR);
+    }
+};
+
+exports.updateAllUserInfo=async function(userId, profileImg,nickname, pwd, updatePwd){
+    try {
+        const connection = await pool.getConnection(async (conn) => conn);
+
+        const userCheckRes=await userProvider.userStatusCheck(userId);
+        if(userCheckRes[0].status==="DELETED")
+            return errResponse(baseResponse.WITHDRAWAL_ACCOUNT);
+
+        const hashedPassword = await crypto
+            .createHash("sha512")
+            .update(pwd)
+            .digest("hex");
+
+        const pwdCheck=await userProvider.passwordCheck(userId);
+        if(pwdCheck[0].pwd!==hashedPassword)
+            return errResponse(baseResponse.WRONG_PASSWORD);
+
+        const hashedPwdToUpdate = await crypto
+            .createHash("sha512")
+            .update(updatePwd)
+            .digest("hex");
+
+        const updateUserInfoRes=await userDao.updateAllUserInfo(connection,profileImg,nickname,hashedPwdToUpdate, userId);
+        console.log(`${userId}번 유저 정보 변경 성공`);
+        connection.release();
+        return response(baseResponse.UPDATE_USER_INFO_SUCCESS);
+    }
+    catch(err){
+        logger.error(`App - updateUserInfo Service error\n: ${err.message}`);
+        return errResponse(baseResponse.DB_ERROR);
     }
 };

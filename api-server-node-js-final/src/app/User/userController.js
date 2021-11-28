@@ -30,16 +30,47 @@ exports.postUser=async function(req,res){
    return res.send(signUpRes);
 };
 
+exports.withdraw=async function(req,res){
+    const userIdFromJWT=req.verifiedToken.userId;
+    const withdrawUserRes=await userService.updateUserStatus(userIdFromJWT);
+    return res.send(withdrawUserRes);
+};
+
 exports.getUserInfo=async function(req,res){
     const userIdFromJWT=req.verifiedToken.userId;
+    const userId=req.params.userId;
+    if(userIdFromJWT!=userId)
+        return res.send(errResponse(baseResponse.NOT_LOGIN_USER_ID));
     const userInfoRes=await userProvider.retrieveUserInfo(userIdFromJWT);
     return res.send(userInfoRes);
 };
 
 exports.updateUserInfo=async function(req,res){
     const userIdFromJWT=req.verifiedToken.userId;
-    const {profileImg,nickname,pwd}=req.body;
-    //TODO 유저 정보 수정
+    const userId=req.params.userId;
+    const {profileImg,nickname,pwd,updatePwd}=req.body;
+    if(userIdFromJWT!=userId)
+        return res.send(errResponse(baseResponse.NOT_LOGIN_USER_ID));
+    if(!profileImg)
+        return res.send(errResponse(baseResponse.ENTER_IMG_URL_TO_UPDATE));
+    if(!nickname)
+        return res.send(errResponse(baseResponse.ENTER_NICKNAME_TO_UPDATE));
+    if(nickname.length>20)
+        return res.send(errResponse(baseResponse.NICKNAME_LENGTH_OVER));
+
+    if(updatePwd) { //바꾸려는 비밀번호 있으면 비밀번호 변경까지 같이
+        if (!pwd)
+            return res.send(errResponse(baseResponse.ENTER_PWD_TO_USER_CHECK));
+        if(!regexPwd.test(updatePwd))
+            return res.send(response(baseResponse.PASSWORD_REGEX_WRONG));
+
+        const updateUserInfoRes=await userService.updateAllUserInfo(userIdFromJWT,profileImg,nickname,pwd,updatePwd);
+        return res.send(updateUserInfoRes);
+    }
+    else{ //아니면 프로필사진,닉네임만 변경되도록
+        const updateUserInfoRes=await userService.updateUserInfo(userIdFromJWT,profileImg,nickname);
+        return res.send(updateUserInfoRes);
+    }
 };
 
 exports.postVerification=async function(req,res){

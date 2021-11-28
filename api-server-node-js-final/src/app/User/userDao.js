@@ -257,3 +257,27 @@ exports.updateReviewTags=async function(connection,tagId){
     const updateReviewTagsQueryRow=await connection.query(updateReviewTagsQuery,tagId);
     return updateReviewTagsQueryRow;
 };
+
+exports.updateUserInfo=async function(connection,profileImg,nickname,userId){
+    const updateUserInfoQuery=`
+        UPDATE User SET profileImg=?,nickname=? WHERE userId=?;
+    `;
+    const updateUserInfoQueryRow=await connection.query(updateUserInfoQuery,[profileImg,nickname,userId]);
+    return updateUserInfoQueryRow;
+};
+
+exports.updateAllUserInfo=async function(connection,profileImg,nickname,hashedPwdToUpdate, userId){
+    const updateAllUserInfoQuery=`
+        UPDATE User SET profileImg=?,nickname=?,pwd=? WHERE userId=?;
+    `;
+    const updateAllUserInfoQueryRow=await connection.query(updateAllUserInfoQuery,[profileImg,nickname,hashedPwdToUpdate, userId]);
+    return updateAllUserInfoQueryRow;
+};
+
+exports.updateUserStatus=async function(connection,userId){
+    const updateUserStatusQuery=`
+        UPDATE User SET status="DELETED" WHERE userId=?;
+    `;
+    const updateUserStatusQueryRow=await connection.query(updateUserStatusQuery,userId);
+    return updateUserStatusQueryRow;
+};
