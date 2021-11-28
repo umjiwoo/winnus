@@ -8,6 +8,8 @@ module.exports = {
     SUBSCRIBE_SUCCESS:{"isSuccess": true, "code": 1005, "message":"와인 찜 등록 성공" },
     UNSUBSCRIBE_SUCCESS:{"isSuccess": true, "code": 1005, "message":"와인 찜 해제 성공" },
     DELETE_ALL_SEARCHED_KEYWORD_SUCCESS:{"isSuccess": true, "code": 1006, "message":"검색 기록 전체 삭제 성공"},
+    UPDATE_USER_INFO_SUCCESS:{"isSuccess": true, "code": 1007, "message":"사용자 정보 수정 성공"},
+    USER_WITHDRAW_SUCCESS:{"isSuccess": true, "code": 1008, "message":"사용자 탈퇴 성공"},
 
     // Common
     TOKEN_EMPTY : { "isSuccess": false, "code": 2000, "message":"JWT 토큰을 입력해주세요." },
@@ -50,6 +52,10 @@ module.exports = {
 
     ENTER_REIVEW_ID_TO_UPDATE:{"isSuccess": false, "code": 2039, "message": "수정할 리뷰 인덱스를 입력해주세요."},
 
+    ENTER_IMG_URL_TO_UPDATE:{"isSuccess": false, "code": 2040, "message": "변경할 이미지 url을 입력해주세요."},
+    ENTER_NICKNAME_TO_UPDATE:{"isSuccess": false, "code": 2041, "message": "변경할 닉네임을 입력해주세요."},
+    ENTER_PWD_TO_USER_CHECK:{"isSuccess": false, "code": 2042, "message": "비밀번호 변경을 위해 기존 비밀번호를 입력해주세요."},
+
     // Response error
     ALREADY_SIGN_UP:{"isSuccess": false, "code": 3001, "message":"이미 가입되어 있는 전화번호입니다."},
     NICKNAME_ALREADY_EXIST:{"isSuccess": false, "code": 3002, "message":"이미 사용중인 닉네임입니다."},
@@ -86,6 +92,9 @@ module.exports = {
     DELETED_REVIEW:{"isSuccess": false, "code": 3042, "message": "삭제된 리뷰 인덱스 입니다."},
 
     SHOP_WINE_NOT_EXIST:{"isSuccess": false, "code": 3043, "message": "데이터 베이스의 와인 중 해당 와인샵에서 취급하는 와인이 존재하지 않습니다."},
+    WRONG_PASSWORD:{"isSuccess": false, "code": 3043, "message": "기존 비밀번호가 일치하지 않습니다."},
+
+    ALREADY_WITHDRAWN_USER:{"isSuccess": false, "code": 3044, "message": "이미 탈퇴한 회원입니다."},
 
     //Connection, Transaction 등의 서버 오류
     DB_ERROR : { "isSuccess": false, "code": 4000, "message": "데이터 베이스 에러"},

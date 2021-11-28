@@ -6,6 +6,9 @@ module.exports = function(app){
     //회원가입 api
     app.post('/app/users',user.postUser);
 
+    //탈퇴
+    app.patch('/app/users/withdraw',jwtMiddleware,user.withdraw);
+
     //휴대폰 문자 인증 api
     app.post('/app/verifications',user.postVerification);
     //인증번호 확인 api
