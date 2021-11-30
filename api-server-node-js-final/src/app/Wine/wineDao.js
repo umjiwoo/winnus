@@ -40,6 +40,7 @@ exports.selectSimpleWineInfo = async function (connection, userId, wineIdx) {
         SELECT wineId,
                wineImg,
                wineName,
+               quantity,
                price,
                country,
                region,
@@ -499,4 +500,9 @@ exports.selectShopWine = async function (connection, userId, shopId) {
     `;
     const [selectShopWineQueryRow] = await connection.query(selectShopWineQuery, [userId, shopId]);
     return selectShopWineQueryRow;
+};
+
+exports.selectWineByFiltering=async function(connection,sql,queryParams){
+    const [wineFilteringRes]=await connection.query(sql,queryParams);
+    return wineFilteringRes;
 };

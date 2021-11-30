@@ -5,6 +5,7 @@ const baseResponse = require("../../../config/baseResponseStatus");
 const {response, errResponse} = require("../../../config/response");
 
 const {emit} = require("nodemon");
+const {insertKeyword} = require("../User/userDao");
 
 exports.getWineList=async function(req,res){
     const userId=req.verifiedToken.userId;
@@ -66,11 +67,17 @@ exports.getWineByName=async function(req,res){
 
 exports.getWineListByFilter=async function(req,res){
     const userIdFromJWT=req.verifiedToken.userId;
-    const {keyword,type,taste,flavors,foods,price}=req.query;
+    const {keyword,type,sweetness,acidity,body,tannin,flavors,foods,price,page}=req.query;
 
-    if(!taste)
-        return res.send(errResponse(baseResponse.TASTE_LIST_EMPTY));
-    const getWineListByFilterRes=await wineProvider.retrieveWinesByFilter(userIdFromJWT,keyword,type,taste,flavors,foods,price);
+    if(!keyword&&!type&&!sweetness&&!acidity&&!body&&!tannin&&!flavors&&!foods&&!price)
+        return res.send(errResponse(baseResponse.CHOOSE_FILTERING_ITEM));
+
+    if(!page)
+        return res.send(errResponse(baseResponse.ENTER_PAGE_NUMBER_TO_GET));
+    if(page<1)
+        return res.send(errResponse(baseResponse.PAGE_NUMBER_BEGIN_WITH_1));
+
+    const getWineListByFilterRes=await wineProvider.retrieveWinesByFilter(userIdFromJWT,keyword,type,sweetness,acidity,body,tannin,flavors,foods,price,page);
     return res.send(getWineListByFilterRes);
 };
 
