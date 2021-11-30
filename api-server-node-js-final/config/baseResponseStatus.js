@@ -60,6 +60,9 @@ module.exports = {
     ENTER_PAGE_NUMBER_TO_GET:{"isSuccess": false, "code": 2044, "message": "조회할 페이지를 선택해주세요."},
     PAGE_NUMBER_BEGIN_WITH_1:{"isSuccess": false, "code": 2045, "message": "페이지 인덱스는 1부터 시작합니다."},
 
+    ENTER_PASSWORD_TO_WITHDRAW:{"isSuccess": false, "code": 2046, "message": "회원 탈퇴를 위해 비밀번호를 입력해주세요."},
+    ENTER_REASON_FOR_WITHDRAW:{"isSuccess": false, "code": 2047, "message": "탈퇴 이유를 선택해주세요."},
+
     // Response error
     ALREADY_SIGN_UP:{"isSuccess": false, "code": 3001, "message":"이미 가입되어 있는 전화번호입니다."},
     NICKNAME_ALREADY_EXIST:{"isSuccess": false, "code": 3002, "message":"이미 사용중인 닉네임입니다."},
@@ -69,6 +72,7 @@ module.exports = {
     USER_NOT_EXIST:{"isSuccess": false, "code": 3006, "message": "해당하는 회원이 존재하지 않습니다."},
     WITHDRAWAL_ACCOUNT:{"isSuccess": false, "code": 3007, "message": "탈퇴한 회원입니다."},
     SIGN_IN_PASSWORD_WRONG:{"isSuccess": false, "code": 3008, "message": "비밀번호가 일치하지 않습니다."},
+    WITHDRAWAL_ACCOUNT_PHONE_NUMBER:{"isSuccess": false, "code": 3009, "message": "탈퇴한 회원의 번호입니다. 전화번호 주인이 바뀐 경우 Q&A에 문의해주세요."},
 
 
     ENTER_WINE_ID:{"isSuccess": false, "code": 3030, "message": "리뷰를 작성할 와인 인덱스를 입력해주세요."},

@@ -1,120 +1,151 @@
-exports.selectUserStatus=async function(connection,userId){
-    const selectUserStatusQuery=`
-        SELECT status FROM User WHERE userId=?;
+exports.selectUserStatus = async function (connection, userId) {
+    const selectUserStatusQuery = `
+        SELECT status
+        FROM User
+        WHERE userId = ?;
     `;
-    const [selectUserStatusQueryRow]=await connection.query(selectUserStatusQuery,userId);
+    const [selectUserStatusQueryRow] = await connection.query(selectUserStatusQuery, userId);
     return selectUserStatusQueryRow;
 };
 
-exports.selectUserNickname=async function(connection,nickname){
-    const selectUserNicknameQuery=`
-        SELECT userId FROM User WHERE nickname=?;
+exports.selectUserNickname = async function (connection, nickname) {
+    const selectUserNicknameQuery = `
+        SELECT userId
+        FROM User
+        WHERE nickname = ?;
     `;
-    const [selectUserNicknameQueryRow]=await connection.query(selectUserNicknameQuery,nickname);
+    const [selectUserNicknameQueryRow] = await connection.query(selectUserNicknameQuery, nickname);
     return selectUserNicknameQueryRow;
 };
 
-exports.selectUserPhoneNum=async function(connection,phoneNum){
-    const selectUserPhoneNumQuery=`
-        SELECT userId,status FROM User WHERE phoneNum=?;
+exports.selectUserPhoneNum = async function (connection, phoneNum) {
+    const selectUserPhoneNumQuery = `
+        SELECT userId, status
+        FROM User
+        WHERE phoneNum = ?;
     `;
-    const [selectUserPhoneNumQueryRow]=await connection.query(selectUserPhoneNumQuery,phoneNum);
+    const [selectUserPhoneNumQueryRow] = await connection.query(selectUserPhoneNumQuery, phoneNum);
     return selectUserPhoneNumQueryRow;
 };
 
-exports.selectUserPassword=async function(connection,userId){
-    const selectUserPasswordQuery=`
-        SELECT pwd FROM User WHERE userId=?;
+exports.selectUserPassword = async function (connection, userId) {
+    const selectUserPasswordQuery = `
+        SELECT pwd
+        FROM User
+        WHERE userId = ?;
     `;
-    const [selectUserPasswordQueryRow]=await connection.query(selectUserPasswordQuery,userId);
+    const [selectUserPasswordQueryRow] = await connection.query(selectUserPasswordQuery, userId);
     return selectUserPasswordQueryRow;
 };
 
-exports.insertUser=async function(connection,nickname,phoneNum,pwd){
-    const insertUserQuery=`
-        INSERT INTO User (nickname,phoneNum,pwd) VALUE (?,?,?);
+exports.insertUser = async function (connection, nickname, phoneNum, pwd) {
+    const insertUserQuery = `
+        INSERT INTO User (nickname, phoneNum, pwd) VALUE (?,?,?);
     `;
-    const insertUserQueryRow=await connection.query(insertUserQuery,[nickname,phoneNum,pwd]);
+    const insertUserQueryRow = await connection.query(insertUserQuery, [nickname, phoneNum, pwd]);
     return insertUserQueryRow[0];
 };
 
-exports.selectUserInfo=async function(connection,userId){
-    const selectUserInfoQuery=`
-        SELECT nickname,profileImg,phoneNum
+exports.selectUserInfo = async function (connection, userId) {
+    const selectUserInfoQuery = `
+        SELECT nickname, profileImg, phoneNum
         FROM User
-        WHERE userId=?;
+        WHERE userId = ?;
     `;
-    const [selectUserInfoQueryRow]=await connection.query(selectUserInfoQuery,userId);
+    const [selectUserInfoQueryRow] = await connection.query(selectUserInfoQuery, userId);
     return selectUserInfoQueryRow;
 };
 
 
-exports.insertReview=async function(connection,wineId,userId,rating,content){
-    const insertReviewQuery=`
-        INSERT INTO Review VALUES (null,?,?,?,?,default,default,default);
+exports.insertReview = async function (connection, wineId, userId, rating, content) {
+    const insertReviewQuery = `
+        INSERT INTO Review
+        VALUES (null, ?, ?, ?, ?, default, default, default);
     `;
-    const insertReviewQueryRow=await connection.query(insertReviewQuery,[wineId,userId,rating,content]);
+    const insertReviewQueryRow = await connection.query(insertReviewQuery, [wineId, userId, rating, content]);
     return insertReviewQueryRow[0];
 };
 
-exports.insertTag=async function(connection,reviewId,userId,tagContent){
-    const insertTagQuery=`
-        INSERT INTO Tag VALUES (null,?,?,?,default,default,default);
+exports.insertTag = async function (connection, reviewId, userId, tagContent) {
+    const insertTagQuery = `
+        INSERT INTO Tag
+        VALUES (null, ?, ?, ?, default, default, default);
     `;
-    const insertTagQueryRow=await connection.query(insertTagQuery,[reviewId,userId,tagContent]);
+    const insertTagQueryRow = await connection.query(insertTagQuery, [reviewId, userId, tagContent]);
     return insertTagQueryRow;
 };
 
-exports.selectUserSubscribeCheck=async function(connection,userId,wineId){
-    const selectUserSubscribeCheckQuery=`
-        SELECT subscribeId,status FROM Subscribe WHERE userId=? AND wineId=?;
+exports.selectUserSubscribeCheck = async function (connection, userId, wineId) {
+    const selectUserSubscribeCheckQuery = `
+        SELECT subscribeId, status
+        FROM Subscribe
+        WHERE userId = ?
+          AND wineId = ?;
     `;
-    const [selectUserSubscribeCheckQueryRow]=await connection.query(selectUserSubscribeCheckQuery,[userId,wineId]);
+    const [selectUserSubscribeCheckQueryRow] = await connection.query(selectUserSubscribeCheckQuery, [userId, wineId]);
     return selectUserSubscribeCheckQueryRow;
 };
 
-exports.insertSubscribe=async function(connection,userId,wineId){
-    const insertSubscribeQuery=`
-        INSERT INTO Subscribe VALUES (null,?,?,default,default,default);
+exports.insertSubscribe = async function (connection, userId, wineId) {
+    const insertSubscribeQuery = `
+        INSERT INTO Subscribe
+        VALUES (null, ?, ?, default, default, default);
     `;
-    const insertSubscribeQueryRow=await connection.query(insertSubscribeQuery,[userId,wineId]);
+    const insertSubscribeQueryRow = await connection.query(insertSubscribeQuery, [userId, wineId]);
     return insertSubscribeQueryRow;
 };
 
-exports.updateSubscribeStatus=async function(connection,subscribeId,status){
-    const updateSubscribeStatusQuery=`
-        UPDATE Subscribe SET status=? WHERE subscribeId=?;
+exports.updateSubscribeStatus = async function (connection, subscribeId, status) {
+    const updateSubscribeStatusQuery = `
+        UPDATE Subscribe
+        SET status=?
+        WHERE subscribeId = ?;
     `;
-    const updateSubscribeStatusQueryRow=await connection.query(updateSubscribeStatusQuery,[status,subscribeId]);
+    const updateSubscribeStatusQueryRow = await connection.query(updateSubscribeStatusQuery, [status, subscribeId]);
     return updateSubscribeStatusQueryRow;
 };
 
-exports.selectSubscribeCount=async function(connection,userId){
-    const selectSubscribeCountQuery=`
-        SELECT count(subscribeId) as subscribeNum FROM Subscribe WHERE userId=? and status="Y";
+exports.selectSubscribeCount = async function (connection, userId) {
+    const selectSubscribeCountQuery = `
+        SELECT count(subscribeId) as subscribeNum
+        FROM Subscribe
+        WHERE userId = ?
+          and status = "Y";
     `;
-    const [selectSubscribeCountQueryRow]=await connection.query(selectSubscribeCountQuery,userId);
+    const [selectSubscribeCountQueryRow] = await connection.query(selectSubscribeCountQuery, userId);
     return selectSubscribeCountQueryRow;
 };
 
-exports.selectUserSubscribeList=async function(connection,userId){
-    const selectUserSubscribeListQuery=`
-        SELECT wineId,wineImg,wineName,country,region,quantity,price,
+exports.selectUserSubscribeList = async function (connection, userId) {
+    const selectUserSubscribeListQuery = `
+        SELECT wineId,
+               wineImg,
+               wineName,
+               country,
+               region,
+               quantity,
+               price,
                CASE
                    WHEN (select status from Subscribe where wineId = Wine.wineId and userId = ?) = "Y"
                        THEN "Y"
                    ELSE "N"
-                   END AS userSubscribeStatus,
-               (select count(subscribeId) from Subscribe where Subscribe.status="Y" and wineId=Wine.wineId) as subscribeCount,
-               (select count(reviewId) from Review where Review.status="REGISTERED" and wineId=Wine.wineId) as reviewCount
+                   END                      AS userSubscribeStatus,
+               (select count(subscribeId)
+                from Subscribe
+                where Subscribe.status = "Y"
+                  and wineId = Wine.wineId) as subscribeCount,
+               (select count(reviewId)
+                from Review
+                where Review.status = "REGISTERED"
+                  and wineId = Wine.wineId) as reviewCount
         FROM Wine
-        WHERE wineId IN (select wineId from Subscribe where userId=? and status="Y");
+        WHERE wineId IN (select wineId from Subscribe where userId = ? and status = "Y");
     `;
-    const [selectUserSubscribeListQueryRow]=await connection.query(selectUserSubscribeListQuery,[userId,userId]);
+    const [selectUserSubscribeListQueryRow] = await connection.query(selectUserSubscribeListQuery, [userId, userId]);
     return selectUserSubscribeListQueryRow;
 };
 
-exports.selectSearchedKeyword=async function(connection, userId, keyword) {
+exports.selectSearchedKeyword = async function (connection, userId, keyword) {
     const selectSearchedKeywordQuery = `
         SELECT searchId, keyword, status
         FROM Searched
@@ -125,7 +156,7 @@ exports.selectSearchedKeyword=async function(connection, userId, keyword) {
     return selectSearchedKeywordQueryRow;
 };
 
-exports.updateSearchKeyword=async function(connection, searchId, status) {
+exports.updateSearchKeyword = async function (connection, searchId, status) {
     const updateSearchKeywordQuery = `
         UPDATE Searched
         SET status=?
@@ -135,7 +166,7 @@ exports.updateSearchKeyword=async function(connection, searchId, status) {
     return updateSearchKeywordQueryRow;
 };
 
-exports.createSearchKeyword=async function(connection, userId, keyword) {
+exports.createSearchKeyword = async function (connection, userId, keyword) {
     const createSearchKeywordQuery = `
         INSERT INTO Searched
         VALUES (null, ?, ?, default, default, default);
@@ -144,54 +175,58 @@ exports.createSearchKeyword=async function(connection, userId, keyword) {
     return createSearchKeywordQueryRow;
 };
 
-exports.selectSearchCount=async function(connection,keyword){
-    const selectSearchCountQuery=`
-        SELECT searchCount FROM SearchCount where keyword=?;
+exports.selectSearchCount = async function (connection, keyword) {
+    const selectSearchCountQuery = `
+        SELECT searchCount
+        FROM SearchCount
+        where keyword = ?;
     `;
-    const [selectSearchCountQueryRow]=await connection.query(selectSearchCountQuery,keyword);
+    const [selectSearchCountQueryRow] = await connection.query(selectSearchCountQuery, keyword);
     return selectSearchCountQueryRow;
 };
 
-exports.insertKeyword=async function(connection,keyword){
-    const insertKeywordQuery=`
+exports.insertKeyword = async function (connection, keyword) {
+    const insertKeywordQuery = `
         INSERT INTO SearchCount (keyword) VALUE (?);
     `;
-    const insertKeywordQueryRow=await connection.query(insertKeywordQuery,keyword);
+    const insertKeywordQueryRow = await connection.query(insertKeywordQuery, keyword);
     return insertKeywordQueryRow;
 };
 
-exports.updateSearchCount=async function(connection,searchCount,keyword){
-    const updateSearchCountQuery=`
-        UPDATE SearchCount SET searchCount=? WHERE keyword=?;
+exports.updateSearchCount = async function (connection, searchCount, keyword) {
+    const updateSearchCountQuery = `
+        UPDATE SearchCount
+        SET searchCount=?
+        WHERE keyword = ?;
     `;
-    const updateSearchCountQueryRow=await connection.query(updateSearchCountQuery,[searchCount,keyword]);
+    const updateSearchCountQueryRow = await connection.query(updateSearchCountQuery, [searchCount, keyword]);
     return updateSearchCountQueryRow;
 };
 
-exports.selectSearchedList=async function(connection,userId){
+exports.selectSearchedList = async function (connection, userId) {
     const selectSearchedListQuery = `
         SELECT searchId, keyword
         FROM Searched
         WHERE userId = ?
-            AND (status = 'REGISTERED' OR status='UPDATED')
-        ORDER BY updatedAt DESC
-        LIMIT 5;
+          AND (status = 'REGISTERED' OR status = 'UPDATED')
+        ORDER BY updatedAt DESC LIMIT 5;
     `;
     const [selectSearchedListQueryRow] = await connection.query(selectSearchedListQuery, userId);
     return selectSearchedListQueryRow;
 };
 
-exports.selectAllSearchId=async function(connection, userId) {
+exports.selectAllSearchId = async function (connection, userId) {
     const selectAllSearchIdQuery = `
         SELECT searchId
         FROM Searched
-        WHERE userId = ? AND status="REGISTERED" OR status="UPDATED";
+        WHERE userId = ? AND status = "REGISTERED"
+           OR status = "UPDATED";
     `;
     const [selectAllSearchIdQueryRow] = await connection.query(selectAllSearchIdQuery, userId);
     return selectAllSearchIdQueryRow;
 };
 
-exports.updateKeywordStatus=async function(connection, searchId) {
+exports.updateKeywordStatus = async function (connection, searchId) {
     const updateKeywordStatusQuery = `
         UPDATE Searched
         SET status="DELETED"
@@ -201,83 +236,100 @@ exports.updateKeywordStatus=async function(connection, searchId) {
     return updateKeywordStatusQueryRow;
 };
 
-exports.selectSearchIdStatus=async function(connection,userId,searchId){
-    const selectSearchIdStatusQuery=`
-        SELECT searchId,status
+exports.selectSearchIdStatus = async function (connection, userId, searchId) {
+    const selectSearchIdStatusQuery = `
+        SELECT searchId, status
         FROM Searched
-        WHERE userId=? AND searchId=?;
+        WHERE userId = ?
+          AND searchId = ?;
     `;
-    const [selectSearchIdStatusQueryRow]=await connection.query(selectSearchIdStatusQuery,[userId,searchId]);
+    const [selectSearchIdStatusQueryRow] = await connection.query(selectSearchIdStatusQuery, [userId, searchId]);
     return selectSearchIdStatusQueryRow;
 };
 
-exports.selectHotSearched=async function(connection){
-    const selectHotSearchedQuery=`
+exports.selectHotSearched = async function (connection) {
+    const selectHotSearchedQuery = `
         SELECT keyword
         FROM SearchCount
-        ORDER BY searchCount DESC
-        LIMIT 10;
+        ORDER BY searchCount DESC LIMIT 10;
     `;
-    const [selectHotSearchedQueryRow]=await connection.query(selectHotSearchedQuery);
+    const [selectHotSearchedQueryRow] = await connection.query(selectHotSearchedQuery);
     return selectHotSearchedQueryRow;
 };
 
-exports.selectUserReviewIds=async function(connection,userId){
-    const selectUserReviewsQuery=`
+exports.selectUserReviewIds = async function (connection, userId) {
+    const selectUserReviewsQuery = `
         SELECT reviewId
         FROM Review
-        WHERE userId=? AND status!="DELETED";
+        WHERE userId = ?
+          AND status!="DELETED";
     `;
-    const [selectUserReviewsQueryRow]=await connection.query(selectUserReviewsQuery,userId);
+    const [selectUserReviewsQueryRow] = await connection.query(selectUserReviewsQuery, userId);
     return selectUserReviewsQueryRow;
 };
 
-exports.selectReviewUserCheck=async function(connection,userId,reviewId){
-   const selectReviewUserCheckQuery=`
+exports.selectReviewUserCheck = async function (connection, userId, reviewId) {
+    const selectReviewUserCheckQuery = `
         SELECT status
         FROM Review
-        WHERE userId=? AND reviewId=?;
-   `;
-   const [selectReviewUserCheckQueryRow]=await connection.query(selectReviewUserCheckQuery,[userId,reviewId]);
-   return selectReviewUserCheckQueryRow;
+        WHERE userId = ?
+          AND reviewId = ?;
+    `;
+    const [selectReviewUserCheckQueryRow] = await connection.query(selectReviewUserCheckQuery, [userId, reviewId]);
+    return selectReviewUserCheckQueryRow;
 };
 
-exports.updateUserReview=async function(connection,reviewUpdateArgs){
-    const updateUserReviewQuery=`
-        UPDATE Review SET rating=?,content=? WHERE reviewId=?;
+exports.updateUserReview = async function (connection, reviewUpdateArgs) {
+    const updateUserReviewQuery = `
+        UPDATE Review
+        SET rating=?,
+            content=?
+        WHERE reviewId = ?;
     `;
-    const updateUserReviewQueryRow=await connection.query(updateUserReviewQuery,reviewUpdateArgs);
+    const updateUserReviewQueryRow = await connection.query(updateUserReviewQuery, reviewUpdateArgs);
     return updateUserReviewQueryRow;
 };
 
-exports.updateReviewTags=async function(connection,tagId){
-    const updateReviewTagsQuery=`
-        UPDATE Tag SET status="DELETED" WHERE tagId=?;
+exports.updateReviewTags = async function (connection, tagId) {
+    const updateReviewTagsQuery = `
+        UPDATE Tag
+        SET status="DELETED"
+        WHERE tagId = ?;
     `;
-    const updateReviewTagsQueryRow=await connection.query(updateReviewTagsQuery,tagId);
+    const updateReviewTagsQueryRow = await connection.query(updateReviewTagsQuery, tagId);
     return updateReviewTagsQueryRow;
 };
 
-exports.updateUserInfo=async function(connection,profileImg,nickname,userId){
-    const updateUserInfoQuery=`
-        UPDATE User SET profileImg=?,nickname=? WHERE userId=?;
+exports.updateUserInfo = async function (connection, profileImg, nickname, userId) {
+    const updateUserInfoQuery = `
+        UPDATE User
+        SET profileImg=?,
+            nickname=?
+        WHERE userId = ?;
     `;
-    const updateUserInfoQueryRow=await connection.query(updateUserInfoQuery,[profileImg,nickname,userId]);
+    const updateUserInfoQueryRow = await connection.query(updateUserInfoQuery, [profileImg, nickname, userId]);
     return updateUserInfoQueryRow;
 };
 
-exports.updateAllUserInfo=async function(connection,profileImg,nickname,hashedPwdToUpdate, userId){
-    const updateAllUserInfoQuery=`
-        UPDATE User SET profileImg=?,nickname=?,pwd=? WHERE userId=?;
+exports.updateAllUserInfo = async function (connection, profileImg, nickname, hashedPwdToUpdate, userId) {
+    const updateAllUserInfoQuery = `
+        UPDATE User
+        SET profileImg=?,
+            nickname=?,
+            pwd=?
+        WHERE userId = ?;
     `;
-    const updateAllUserInfoQueryRow=await connection.query(updateAllUserInfoQuery,[profileImg,nickname,hashedPwdToUpdate, userId]);
+    const updateAllUserInfoQueryRow = await connection.query(updateAllUserInfoQuery, [profileImg, nickname, hashedPwdToUpdate, userId]);
     return updateAllUserInfoQueryRow;
 };
 
-exports.updateUserStatus=async function(connection,userId){
-    const updateUserStatusQuery=`
-        UPDATE User SET status="DELETED" WHERE userId=?;
+exports.updateUserStatus = async function (connection, userId, reasonId) {
+    const updateUserStatusQuery = `
+        UPDATE User
+        SET status="DELETED",
+            withdrawReason=?
+        WHERE userId = ?;
     `;
-    const updateUserStatusQueryRow=await connection.query(updateUserStatusQuery,userId);
+    const updateUserStatusQueryRow = await connection.query(updateUserStatusQuery, [reasonId, userId]);
     return updateUserStatusQueryRow;
 };
