@@ -35,7 +35,7 @@ exports.selectWineList = async function (connection, userId) {
     return selectWineListQueryRow;
 };
 
-exports.selectTodayWineInfo = async function (connection, userId, wineIdx) {
+exports.selectTodayWineInfo = async function (connection, queryParams) {
     const selectTodayWinesQuery = `
         SELECT wineId,
                wineImg,
@@ -49,9 +49,9 @@ exports.selectTodayWineInfo = async function (connection, userId, wineIdx) {
                    ELSE "N"
                    END AS userSubscribeStatus
         FROM Wine
-        WHERE wineId = ?;
+        WHERE wineId IN (?);
     `;
-    const [selectTodayWinesQueryRow] = await connection.query(selectTodayWinesQuery, [userId, wineIdx]);
+    const [selectTodayWinesQueryRow] = await connection.query(selectTodayWinesQuery, queryParams);
     return selectTodayWinesQueryRow;
 };
 
