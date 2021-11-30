@@ -1,5 +1,6 @@
 const {pool} = require("../../../config/database");
 const {logger} = require("../../../config/winston");
+const index=require("../../../index");
 
 const wineDao = require("./wineDao");
 
@@ -28,27 +29,28 @@ exports.retrieveWineListByType = async function (userId, type) {
 
 exports.retrieveTodayWineList = async function (userId) {
     const connection = await pool.getConnection(async (conn) => conn);
-    //전체 와인 수 조회
-    const wineNum = await wineDao.selectWineCount(connection);
-    //와인 인덱스값 내에서 랜덤하게 번호 추출-6개
-    const wineIdxList = [];
-    while (wineIdxList.length < 6) {
-        const randomNum = Math.floor(Math.random() * wineNum[0].wineNum) + 1;
-        if (!wineIdxList.includes(randomNum))
-            wineIdxList.push(randomNum);
+
+    let queryParams=[userId];
+    let wineIdList=[];
+    if(index.wineIdxList.length!=0) {
+        console.log("오늘의 와인 인덱스: ", index.wineIdxList);
+        //해당 인덱스 와인(인덱스,이미지,이름,가격) 가져오기
+        queryParams.push(index.wineIdxList);
     }
-    console.log(wineIdxList);
-    //해당 인덱스 와인(인덱스,이미지,이름,가격) 가져오기
-    const todayWineList = [];
-    for (let i = 0; i < wineIdxList.length; i++) {
-        const wineIdx = wineIdxList[i];
-        const wineRes = await wineDao.selectTodayWineInfo(connection, userId, wineIdx);
-        console.log(wineRes);
-        todayWineList.push(wineRes);
+    else{
+        while (wineIdList.length < 6) {
+            const randomNum = Math.floor(Math.random() * 1008) + 1;
+            if (!wineIdList.includes(randomNum))
+                wineIdList.push(randomNum);
+        }
+        queryParams.push(wineIdList);
     }
-    console.log("오늘의 와인 조회 결과", todayWineList);
+    console.log(queryParams);
+
+    const wineRes=await wineDao.selectTodayWineInfo(connection,queryParams);
+    console.log("오늘의 와인 조회 결과", wineRes);
     connection.release();
-    return response(baseResponse.SUCCESS, {todayWines: todayWineList});
+    return response(baseResponse.SUCCESS, {todayWines: wineRes});
 };
 
 exports.retrieveWineInfo = async function (wineId) {
