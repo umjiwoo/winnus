@@ -17,6 +17,8 @@ const accountSid = secret_config.TWILIO_ACCOUNT_SID;
 const authToken = secret_config.TWILIO_AUTH_TOKEN;
 const client = require('twilio')(accountSid, authToken);
 
+global.verifyDict={};
+
 // Service: Create, Update, Delete 비즈니스 로직 처리
 
 exports.createUser = async function (nickname, phoneNum, pwd) {
@@ -53,12 +55,9 @@ exports.createUser = async function (nickname, phoneNum, pwd) {
 
 exports.createVerification = async function (phoneNum) {
     try {
-        global.randomVerificationNumArray = [];
-        global.verifiedPhoneNumArray = [];
-
-        verifiedPhoneNumArray.push(phoneNum);
         const randomVerificationNum = Math.floor(Math.random() * 9000) + 1000; //0000~9999사이의 랜덤값 생성
-        randomVerificationNumArray.push(randomVerificationNum);
+        verifyDict[phoneNum]=randomVerificationNum;
+        console.log("verifyDict",verifyDict);
 
         client.messages
             .create({
@@ -77,21 +76,23 @@ exports.createVerification = async function (phoneNum) {
 
 exports.postVerification = async function (phoneNum, verifyNum) {
     try {
-        const givenPhoneNum = phoneNum;
-        const givenVerifyNum = verifyNum;//인증을 위해 다시 요청한 정보들
-        const existPhoneNum = verifiedPhoneNumArray[0];
-        const existVerifyNum = randomVerificationNumArray[0];//문자 전송 시 저장해놨던 정보들
-
-        if (givenPhoneNum === existPhoneNum && givenVerifyNum === existVerifyNum) {
-            verifiedPhoneNumArray.pop();
-            randomVerificationNumArray.pop();
-            return response(baseResponse.VERIFY_SUCCESS);
-        } else {
-            return errResponse(baseResponse.VERIFY_FAIL);
+        if(phoneNum in verifyDict){
+            if(verifyDict[phoneNum]==verifyNum){
+                delete verifyDict[phoneNum];
+                console.log("verifyDict",verifyDict);
+                return response(baseResponse.VERIFY_SUCCESS);
+            }
+            else{
+                console.log("verifyDict",verifyDict);
+                return errResponse(baseResponse.VERIFY_FAIL);
+            }
+        }
+        else{
+            return errResponse(baseResponse.REQUEST_VERIFY_NUM_FIRST);
         }
     } catch (err) {
         logger.error(`App - postVerification Service error\n: ${err.message}`);
-        return errResponse(baseResponse.REQUEST_VERIFY_NUM_FIRST);
+        return errResponse(baseResponse.SERVER_ERROR);
     }
 };
 

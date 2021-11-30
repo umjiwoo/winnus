@@ -68,7 +68,7 @@ module.exports = {
     NICKNAME_ALREADY_EXIST:{"isSuccess": false, "code": 3002, "message":"이미 사용중인 닉네임입니다."},
     FAIL_TO_SEND_VERIFICATION_MSG:{"isSuccess": false, "code": 3003, "message": "인증 번호 전송에 실패했습니다."},
     VERIFY_FAIL:{"isSuccess": false, "code": 3004, "message": "휴대폰 번호 인증에 실패했습니다. 다시 시도해주세요."},
-    REQUEST_VERIFY_NUM_FIRST:{"isSuccess": false, "code": 3005, "message": "발급받은 인증번호가 없습니다."},
+    REQUEST_VERIFY_NUM_FIRST:{"isSuccess": false, "code": 3005, "message": "해당 번호로 발급받은 인증번호가 없습니다."},
     USER_NOT_EXIST:{"isSuccess": false, "code": 3006, "message": "해당하는 회원이 존재하지 않습니다."},
     WITHDRAWAL_ACCOUNT:{"isSuccess": false, "code": 3007, "message": "탈퇴한 회원입니다."},
     SIGN_IN_PASSWORD_WRONG:{"isSuccess": false, "code": 3008, "message": "비밀번호가 일치하지 않습니다."},

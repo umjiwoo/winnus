@@ -174,7 +174,7 @@ exports.retrieveWineByName = async function (userId, keyword) {
     return response(baseResponse.SUCCESS, [{wineCount: getWineNum}].concat({retrieveWineRes: retrieveWineRes}));
 };
 
-exports.retrieveWinesByFilter = async function (userId, keyword, type, sweetness, acidity, body, tannin, flavors, foods, price, page) {
+exports.retrieveWinesByFilter = async function (userId, keyword, type, sweetness, acidity, body, tannin, flavors, foods, price, page,orderBy) {
     const connection = await pool.getConnection(async (conn) => conn);
 
     let typeList = [];
@@ -310,6 +310,12 @@ exports.retrieveWinesByFilter = async function (userId, keyword, type, sweetness
     sql += whereClause;
 
     let countSql=sql+";";
+
+    if(orderBy=="high")
+        sql+=" order by w.price desc";
+    else if(orderBy=="low")
+        sql+=" order by w.price";
+
 
     sql += " limit 10 offset ";
     sql += (page - 1) * 10;
