@@ -32,7 +32,12 @@ exports.postUser=async function(req,res){
 
 exports.withdraw=async function(req,res){
     const userIdFromJWT=req.verifiedToken.userId;
-    const withdrawUserRes=await userService.updateUserStatus(userIdFromJWT);
+    const {pwd,reasonId}=req.body;
+    if(!pwd)
+        return res.send(errResponse(baseResponse.ENTER_PASSWORD_TO_WITHDRAW));
+    if(!reasonId)
+        return res.send(errResponse(baseResponse.ENTER_REASON_FOR_WITHDRAW));
+    const withdrawUserRes=await userService.updateUserStatus(userIdFromJWT,pwd,reasonId);
     return res.send(withdrawUserRes);
 };
 

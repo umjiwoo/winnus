@@ -4,7 +4,7 @@ const secret_config = require("../../../config/secret");
 const userProvider = require("./userProvider");
 const userDao = require("./userDao");
 const wineProvider = require("../Wine/wineProvider");
-const wineDao=require("../Wine/wineDao");
+const wineDao = require("../Wine/wineDao");
 const baseResponse = require("../../../config/baseResponseStatus");
 const {response} = require("../../../config/response");
 const {errResponse} = require("../../../config/response");
@@ -28,8 +28,8 @@ exports.createUser = async function (nickname, phoneNum, pwd) {
         if (phoneNumCheck.length > 0 && phoneNumCheck[0].status === "REGISTERED")
             return errResponse(baseResponse.ALREADY_SIGN_UP);
 
-        if (phoneNumCheck.length > 0 && phoneNumCheck[0].status === "WITHDRAWN")
-            return errResponse(baseResponse.WITHDRAWAL_ACCOUNT);
+        if (phoneNumCheck.length > 0 && phoneNumCheck[0].status === "DELETED")
+            return errResponse(baseResponse.WITHDRAWAL_ACCOUNT_PHONE_NUMBER);
 
         const nicknameCheck = await userProvider.nicknameCheck(nickname);
         if (nicknameCheck.length > 0)
@@ -96,19 +96,27 @@ exports.postVerification = async function (phoneNum, verifyNum) {
 };
 
 
-exports.updateUserStatus=async function(userId){
+exports.updateUserStatus = async function (userId, pwd, reasonId) {
     try {
         const connection = await pool.getConnection(async (conn) => conn);
 
-        const userCheckRes=await userProvider.userStatusCheck(userId);
-        if(userCheckRes[0].status==="DELETED")
+        const userCheckRes = await userProvider.userStatusCheck(userId);
+        if (userCheckRes[0].status === "DELETED")
             return errResponse(baseResponse.ALREADY_WITHDRAWN_USER);
 
-        const updateUserStatusRes = await userDao.updateUserStatus(connection, userId);
+        const hashedPassword = await crypto
+            .createHash("sha512")
+            .update(pwd)
+            .digest("hex");
+
+        const pwdCheck = await userProvider.passwordCheck(userId);
+        if (pwdCheck[0].pwd !== hashedPassword)
+            return errResponse(baseResponse.WRONG_PASSWORD);
+
+        const updateUserStatusRes = await userDao.updateUserStatus(connection, userId, reasonId);
         connection.release();
         return response(baseResponse.USER_WITHDRAW_SUCCESS);
-    }
-    catch(err){
+    } catch (err) {
         logger.error(`App - withdrawUser Service error\n: ${err.message}`);
         return errResponse(baseResponse.DB_ERROR);
     }
@@ -233,11 +241,10 @@ exports.postSearchKeyword = async function (userId, keyword) {
         await connection.beginTransaction();
 
         //해당 키워드 검색 횟수 가져오기
-        const searchCountRes=await userDao.selectSearchCount(connection,keyword);
-        if(searchCountRes.length<1){//누군가 처음 검색하는 키워드의 경우
-            const postSearchKeyword=await userDao.insertKeyword(connection,keyword);
-        }
-        else {
+        const searchCountRes = await userDao.selectSearchCount(connection, keyword);
+        if (searchCountRes.length < 1) {//누군가 처음 검색하는 키워드의 경우
+            const postSearchKeyword = await userDao.insertKeyword(connection, keyword);
+        } else {
             //키워드 검색 횟수 1증가시켜주기
             const searchCount = searchCountRes[0].searchCount + 1;
             const updateSearchCount = await userDao.updateSearchCount(connection, searchCount, keyword);
@@ -300,19 +307,19 @@ exports.updateSearchedKeyword = async function (userId, searchId) {
     try {
         await connection.beginTransaction();
         //활성화 되어있는 검색어인지,검색어 인덱스 로그인 유저의 검색어가 맞는지 확인
-        const searchKeywordCheck=await userDao.selectSearchIdStatus(connection,userId,searchId);
+        const searchKeywordCheck = await userDao.selectSearchIdStatus(connection, userId, searchId);
 
-        if(searchKeywordCheck.length<1)
+        if (searchKeywordCheck.length < 1)
             return errResponse(baseResponse.NOT_LOGIN_USER_SEARCH);
 
-        if(searchKeywordCheck[0].status==="DELETED")
+        if (searchKeywordCheck[0].status === "DELETED")
             return errResponse(baseResponse.ALREADY_DELETED_SEARCH_KEYWORD);
 
         const updateKeywordStatusRes = await userDao.updateKeywordStatus(connection, searchId);
         console.log(`${searchId}번 검색어 삭제 완료`);
 
         await connection.commit();
-        return response(baseResponse.SUCCESS,{deletedSearchKeywordId:searchId});
+        return response(baseResponse.SUCCESS, {deletedSearchKeywordId: searchId});
     } catch (err) {
         logger.error(`App - updateSearchKeyword Service error\n: ${err.message}`);
         await connection.rollback();
@@ -322,22 +329,22 @@ exports.updateSearchedKeyword = async function (userId, searchId) {
     }
 };
 
-exports.updateReview=async function(userIdFromJWT,reviewId,rating,content,tagList){
+exports.updateReview = async function (userIdFromJWT, reviewId, rating, content, tagList) {
     const connection = await pool.getConnection(async (conn) => conn);
-    try{
+    try {
         await connection.beginTransaction();
         //로그인 유저의 리뷰가 맞는 지 확인
-        const reviewUserCheck=await userDao.selectReviewUserCheck(connection,userIdFromJWT,reviewId);
-        if(reviewUserCheck.length<1)
+        const reviewUserCheck = await userDao.selectReviewUserCheck(connection, userIdFromJWT, reviewId);
+        if (reviewUserCheck.length < 1)
             return errResponse(baseResponse.REVIEW_NOT_EXIST);
-        if(reviewUserCheck[0].status==="DELETED")
+        if (reviewUserCheck[0].status === "DELETED")
             return errResponse(baseResponse.DELETED_REVIEW);
 
-        const reviewUpdateArgs=[rating,content,reviewId];
-        const updateReviewRes=await userDao.updateUserReview(connection,reviewUpdateArgs);
+        const reviewUpdateArgs = [rating, content, reviewId];
+        const updateReviewRes = await userDao.updateUserReview(connection, reviewUpdateArgs);
         console.log(updateReviewRes[0].changedRows);
 
-        if(tagList){
+        if (tagList) {
             console.log("tagList수정 진입");
             // const reviewTagIds=await wineDao.selectWineTagIds(connection,reviewId);
             // console.log(reviewTagIds.length);
@@ -351,31 +358,30 @@ exports.updateReview=async function(userIdFromJWT,reviewId,rating,content,tagLis
             //     const tagContent = tagList[i].tag;
             //     const insertTagRes = await userDao.insertTag(connection, reviewId, userIdFromJWT, tagContent);
             // }
-            const reviewTags=await wineDao.selectWineTags(connection,reviewId);
-            const reviewTagIds=await wineDao.selectWineTagIds(connection,reviewId);
-            const tags=[];
-            const tagIds=[];
-            for(let i=0;i<reviewTags.length;i++){
+            const reviewTags = await wineDao.selectWineTags(connection, reviewId);
+            const reviewTagIds = await wineDao.selectWineTagIds(connection, reviewId);
+            const tags = [];
+            const tagIds = [];
+            for (let i = 0; i < reviewTags.length; i++) {
                 tags.push(reviewTags[i].content);
                 tagIds.push(reviewTagIds[i].tagId);
             }
-            console.log("tags:",tags);
-            console.log("tagIds:",tagIds);
-            for(let i=0;i<tagList.length;i++){
-                const tagContent=tagList[i].tag;
-                if(tags.includes(tagContent)){
-                    const popId=tags.indexOf(tagContent);
-                    tags.splice(popId,1);
-                    tagIds.splice(popId,1);
-                }
-                else{
+            console.log("tags:", tags);
+            console.log("tagIds:", tagIds);
+            for (let i = 0; i < tagList.length; i++) {
+                const tagContent = tagList[i].tag;
+                if (tags.includes(tagContent)) {
+                    const popId = tags.indexOf(tagContent);
+                    tags.splice(popId, 1);
+                    tagIds.splice(popId, 1);
+                } else {
                     console.log("tag insert...");
                     const insertTagRes = await userDao.insertTag(connection, reviewId, userIdFromJWT, tagContent);
                 }
             }
-            console.log("tags-after:",tags);
-            console.log("tagIds-after:",tagIds);
-            if(tagIds.length>0) {
+            console.log("tags-after:", tags);
+            console.log("tagIds-after:", tagIds);
+            if (tagIds.length > 0) {
                 for (let i = 0; i < tagIds.length; i++) {
                     const tagId = tagIds[i];
                     const updateTagStatus = await userDao.updateReviewTags(connection, tagId);
@@ -385,43 +391,40 @@ exports.updateReview=async function(userIdFromJWT,reviewId,rating,content,tagLis
 
         await connection.commit();
         return response(baseResponse.SUCCESS)
-    }
-    catch(err){
+    } catch (err) {
         logger.error(`App - updateReview Service error\n: ${err.message}`);
         await connection.rollback();
         return errResponse(baseResponse.DB_ERROR);
-    }
-    finally{
+    } finally {
         connection.release();
     }
 };
 
-exports.updateUserInfo=async function(userId, profileImg,nickname){
+exports.updateUserInfo = async function (userId, profileImg, nickname) {
     try {
         const connection = await pool.getConnection(async (conn) => conn);
 
         //유효한 유저인지 확인
-        const userCheckRes=await userProvider.userStatusCheck(userId);
-        if(userCheckRes[0].status==="DELETED")
+        const userCheckRes = await userProvider.userStatusCheck(userId);
+        if (userCheckRes[0].status === "DELETED")
             return errResponse(baseResponse.WITHDRAWAL_ACCOUNT);
 
-        const updateUserInfoRes=await userDao.updateUserInfo(connection,profileImg,nickname,userId);
+        const updateUserInfoRes = await userDao.updateUserInfo(connection, profileImg, nickname, userId);
         console.log(`${userId}번 유저 정보 변경 성공`);
         connection.release();
         return response(baseResponse.UPDATE_USER_INFO_SUCCESS);
-    }
-    catch(err){
+    } catch (err) {
         logger.error(`App - updateUserInfo Service error\n: ${err.message}`);
         return errResponse(baseResponse.DB_ERROR);
     }
 };
 
-exports.updateAllUserInfo=async function(userId, profileImg,nickname, pwd, updatePwd){
+exports.updateAllUserInfo = async function (userId, profileImg, nickname, pwd, updatePwd) {
     try {
         const connection = await pool.getConnection(async (conn) => conn);
 
-        const userCheckRes=await userProvider.userStatusCheck(userId);
-        if(userCheckRes[0].status==="DELETED")
+        const userCheckRes = await userProvider.userStatusCheck(userId);
+        if (userCheckRes[0].status === "DELETED")
             return errResponse(baseResponse.WITHDRAWAL_ACCOUNT);
 
         const hashedPassword = await crypto
@@ -429,8 +432,8 @@ exports.updateAllUserInfo=async function(userId, profileImg,nickname, pwd, updat
             .update(pwd)
             .digest("hex");
 
-        const pwdCheck=await userProvider.passwordCheck(userId);
-        if(pwdCheck[0].pwd!==hashedPassword)
+        const pwdCheck = await userProvider.passwordCheck(userId);
+        if (pwdCheck[0].pwd !== hashedPassword)
             return errResponse(baseResponse.WRONG_PASSWORD);
 
         const hashedPwdToUpdate = await crypto
@@ -438,12 +441,11 @@ exports.updateAllUserInfo=async function(userId, profileImg,nickname, pwd, updat
             .update(updatePwd)
             .digest("hex");
 
-        const updateUserInfoRes=await userDao.updateAllUserInfo(connection,profileImg,nickname,hashedPwdToUpdate, userId);
+        const updateUserInfoRes = await userDao.updateAllUserInfo(connection, profileImg, nickname, hashedPwdToUpdate, userId);
         console.log(`${userId}번 유저 정보 변경 성공`);
         connection.release();
         return response(baseResponse.UPDATE_USER_INFO_SUCCESS);
-    }
-    catch(err){
+    } catch (err) {
         logger.error(`App - updateUserInfo Service error\n: ${err.message}`);
         return errResponse(baseResponse.DB_ERROR);
     }
