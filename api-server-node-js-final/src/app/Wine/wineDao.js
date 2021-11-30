@@ -35,12 +35,11 @@ exports.selectWineList = async function (connection, userId) {
     return selectWineListQueryRow;
 };
 
-exports.selectSimpleWineInfo = async function (connection, userId, wineIdx) {
+exports.selectTodayWineInfo = async function (connection, userId, wineIdx) {
     const selectTodayWinesQuery = `
         SELECT wineId,
                wineImg,
                wineName,
-               quantity,
                price,
                country,
                region,
@@ -54,6 +53,30 @@ exports.selectSimpleWineInfo = async function (connection, userId, wineIdx) {
     `;
     const [selectTodayWinesQueryRow] = await connection.query(selectTodayWinesQuery, [userId, wineIdx]);
     return selectTodayWinesQueryRow;
+};
+
+
+exports.selectSimpleWineInfo = async function (connection, userId, wineIdx) {
+    const selectSimpleWineInfoQuery = `
+        SELECT wineId,
+               wineImg,
+               wineName,
+               quantity,
+               price,
+               country,
+               region,
+               CASE
+                   WHEN (select status from Subscribe where wineId = Wine.wineId and userId = ?) = "Y"
+                       THEN "Y"
+                   ELSE "N"
+                   END AS userSubscribeStatus,
+               (select count(subscribeId) from Subscribe where wineId=Wine.wineId) as subscribeCount,
+               (select count(reviewId) from Review where wineId=Wine.wineId) as reviewCount
+        FROM Wine
+        WHERE wineId = ?;
+    `;
+    const [selectSimpleWineInfoQueryRow] = await connection.query(selectSimpleWineInfoQuery, [userId, wineIdx]);
+    return selectSimpleWineInfoQueryRow;
 };
 
 exports.selectWineListByType = async function (connection, userId, type) {
