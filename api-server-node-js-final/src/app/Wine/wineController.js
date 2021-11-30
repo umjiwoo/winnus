@@ -67,7 +67,7 @@ exports.getWineByName=async function(req,res){
 
 exports.getWineListByFilter=async function(req,res){
     const userIdFromJWT=req.verifiedToken.userId;
-    const {keyword,type,sweetness,acidity,body,tannin,flavors,foods,price,page}=req.query;
+    const {keyword,type,sweetness,acidity,body,tannin,flavors,foods,price,page,orderBy}=req.query;
 
     if(!keyword&&!type&&!sweetness&&!acidity&&!body&&!tannin&&!flavors&&!foods&&!price)
         return res.send(errResponse(baseResponse.CHOOSE_FILTERING_ITEM));
@@ -77,7 +77,7 @@ exports.getWineListByFilter=async function(req,res){
     if(page<1)
         return res.send(errResponse(baseResponse.PAGE_NUMBER_BEGIN_WITH_1));
 
-    const getWineListByFilterRes=await wineProvider.retrieveWinesByFilter(userIdFromJWT,keyword,type,sweetness,acidity,body,tannin,flavors,foods,price,page);
+    const getWineListByFilterRes=await wineProvider.retrieveWinesByFilter(userIdFromJWT,keyword,type,sweetness,acidity,body,tannin,flavors,foods,price,page,orderBy);
     return res.send(getWineListByFilterRes);
 };
 
