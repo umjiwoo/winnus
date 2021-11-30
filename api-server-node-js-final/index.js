@@ -11,7 +11,8 @@ const job = schedule.scheduleJob('0 0 24 * *', function () {
         if (!wineIdxList.includes(randomNum))
             wineIdxList.push(randomNum);
     }
-    console.log(wineIdxList);
+    const today=new Date();
+    console.log(`${today.getFullYear()}/${today.getMonth()+1}/${today.getDate()} 오늘의 와인 인덱스 `,wineIdxList);
 });
 //job.cancel();
 
