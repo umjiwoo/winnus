@@ -56,6 +56,10 @@ module.exports = {
     ENTER_NICKNAME_TO_UPDATE:{"isSuccess": false, "code": 2041, "message": "변경할 닉네임을 입력해주세요."},
     ENTER_PWD_TO_USER_CHECK:{"isSuccess": false, "code": 2042, "message": "비밀번호 변경을 위해 기존 비밀번호를 입력해주세요."},
 
+    CHOOSE_FILTERING_ITEM:{"isSuccess": false, "code": 2043, "message": "필터링할 항목을 선택해주세요."},
+    ENTER_PAGE_NUMBER_TO_GET:{"isSuccess": false, "code": 2044, "message": "조회할 페이지를 선택해주세요."},
+    PAGE_NUMBER_BEGIN_WITH_1:{"isSuccess": false, "code": 2045, "message": "페이지 인덱스는 1부터 시작합니다."},
+
     // Response error
     ALREADY_SIGN_UP:{"isSuccess": false, "code": 3001, "message":"이미 가입되어 있는 전화번호입니다."},
     NICKNAME_ALREADY_EXIST:{"isSuccess": false, "code": 3002, "message":"이미 사용중인 닉네임입니다."},
