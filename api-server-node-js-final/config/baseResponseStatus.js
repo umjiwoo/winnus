@@ -63,6 +63,8 @@ module.exports = {
     ENTER_PASSWORD_TO_WITHDRAW:{"isSuccess": false, "code": 2046, "message": "회원 탈퇴를 위해 비밀번호를 입력해주세요."},
     ENTER_REASON_FOR_WITHDRAW:{"isSuccess": false, "code": 2047, "message": "탈퇴 이유를 선택해주세요."},
 
+    ENTER_REVIEW_ID_TO_DELETE:{"isSuccess": false, "code": 2048, "message": "삭제할 리뷰 인덱스를 입력해주세요."},
+
     // Response error
     ALREADY_SIGN_UP:{"isSuccess": false, "code": 3001, "message":"이미 가입되어 있는 전화번호입니다."},
     NICKNAME_ALREADY_EXIST:{"isSuccess": false, "code": 3002, "message":"이미 사용중인 닉네임입니다."},
@@ -93,16 +95,18 @@ module.exports = {
 
     NOT_EXIST_SHOP:{"isSuccess": false, "code": 3048, "message":"등록되지 않았거나 삭제된 와인샵입니다."},
 
-    NOT_LOGIN_USER_SEARCH:{"isSuccess": false, "code": 3039, "message": "로그인 유저가 검색한 키워드 인덱스가 아닙니다."},
-    ALREADY_DELETED_SEARCH_KEYWORD:{"isSuccess": false, "code": 3040, "message": "이미 삭제된 키워드입니다."},
+    NOT_LOGIN_USER_SEARCH:{"isSuccess": false, "code": 3049, "message": "로그인 유저가 검색한 키워드 인덱스가 아닙니다."},
+    ALREADY_DELETED_SEARCH_KEYWORD:{"isSuccess": false, "code": 3050, "message": "이미 삭제된 키워드입니다."},
 
-    REVIEW_NOT_EXIST:{"isSuccess": false, "code": 3041, "message": "해당 인덱스의 리뷰가 존재하지 않거나 로그인 유저의 리뷰가 아닙니다."},
-    DELETED_REVIEW:{"isSuccess": false, "code": 3042, "message": "삭제된 리뷰 인덱스 입니다."},
+    REVIEW_NOT_EXIST:{"isSuccess": false, "code": 3051, "message": "해당 인덱스의 리뷰가 존재하지 않거나 로그인 유저의 리뷰가 아닙니다."},
+    DELETED_REVIEW:{"isSuccess": false, "code": 3052, "message": "삭제된 리뷰 인덱스 입니다."},
 
-    SHOP_WINE_NOT_EXIST:{"isSuccess": false, "code": 3043, "message": "데이터 베이스의 와인 중 해당 와인샵에서 취급하는 와인이 존재하지 않습니다."},
-    WRONG_PASSWORD:{"isSuccess": false, "code": 3043, "message": "기존 비밀번호가 일치하지 않습니다."},
+    SHOP_WINE_NOT_EXIST:{"isSuccess": false, "code": 3053, "message": "데이터 베이스의 와인 중 해당 와인샵에서 취급하는 와인이 존재하지 않습니다."},
+    WRONG_PASSWORD:{"isSuccess": false, "code": 3054, "message": "기존 비밀번호가 일치하지 않습니다."},
 
-    ALREADY_WITHDRAWN_USER:{"isSuccess": false, "code": 3044, "message": "이미 탈퇴한 회원입니다."},
+    ALREADY_WITHDRAWN_USER:{"isSuccess": false, "code": 3055, "message": "이미 탈퇴한 회원입니다."},
+
+    ALREADY_DELETED_REVIEW:{"isSuccess": false, "code": 3056, "message": "이미 삭제된 리뷰 인덱스 입니다."},
 
     //Connection, Transaction 등의 서버 오류
     DB_ERROR : { "isSuccess": false, "code": 4000, "message": "데이터 베이스 에러"},

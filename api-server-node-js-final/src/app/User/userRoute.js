@@ -1,4 +1,5 @@
 const jwtMiddleware = require("../../../config/jwtMiddleware");
+const user = require("./userController");
 module.exports = function(app){
     const user = require('./userController');
     const jwtMiddleware = require('../../../config/jwtMiddleware');
@@ -29,6 +30,10 @@ module.exports = function(app){
     app.post('/app/reviews',jwtMiddleware,user.postReview);
     //사용자 리뷰 조회
     app.get('/app/users/reviews/:userId',jwtMiddleware,user.getUserReviews);
+
+    //리뷰 삭제
+    app.patch("/app/users/reviews/:reviewId",jwtMiddleware,user.updateReviewStatus);
+
     //리뷰 수정
     app.patch('/app/reviews/:reviewId',jwtMiddleware,user.updateReview);
 

@@ -223,3 +223,12 @@ exports.updateReview=async function(req,res){
     const updateReviewRes=await userService.updateReview(userIdFromJWT,reviewId,rating,content,tagList);
     return res.send(updateReviewRes);
 };
+
+exports.updateReviewStatus=async function(req,res){
+    const userIdFromJWT=req.verifiedToken.userId;
+    const reviewId=req.params.reviewId;
+    if(!reviewId)
+        return res.send(errResponse(baseResponse.ENTER_REVIEW_ID_TO_DELETE));
+    const updateReviewStatusRes=await userService.updateReviewStatus(userIdFromJWT,reviewId);
+    return res.send(updateReviewStatusRes);
+};

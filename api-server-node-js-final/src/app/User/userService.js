@@ -401,6 +401,30 @@ exports.updateReview = async function (userIdFromJWT, reviewId, rating, content,
     }
 };
 
+exports.updateReviewStatus=async function(userId,reviewId){
+    const connection = await pool.getConnection(async (conn) => conn);
+    try{
+        await connection.beginTransaction();
+        const reviewUserCheck = await userDao.selectReviewUserCheck(connection, userId, reviewId);
+        if (reviewUserCheck.length < 1)
+            return errResponse(baseResponse.REVIEW_NOT_EXIST);
+        if (reviewUserCheck[0].status === "DELETED")
+            return errResponse(baseResponse.ALREADY_DELETED_REVIEW);
+
+        const updateReviewStatus=await userDao.updateReviewStatus(connection,reviewId);
+        await connection.commit();
+        return response(baseResponse.SUCCESS);
+    }
+    catch(err){
+        logger.error(`App - updateReviewStatus Service error\n: ${err.message}`);
+        await connection.rollback();
+        return errResponse(baseResponse.DB_ERROR);
+    }
+    finally {
+        connection.release();
+    }
+};
+
 exports.updateUserInfo = async function (userId, profileImg, nickname) {
     try {
         const connection = await pool.getConnection(async (conn) => conn);
