@@ -300,6 +300,14 @@ exports.updateReviewTags = async function (connection, tagId) {
     return updateReviewTagsQueryRow;
 };
 
+exports.updateReviewStatus=async function(connection,reviewId){
+    const updateReviewStatusQuery=`
+        UPDATE Review SET status="DELETED" WHERE reviewId=?;
+    `;
+    const updateReviewStatusQueryRow=await connection.query(updateReviewStatusQuery,reviewId);
+    return updateReviewStatusQueryRow;
+};
+
 exports.updateUserInfo = async function (connection, profileImg, nickname, userId) {
     const updateUserInfoQuery = `
         UPDATE User
