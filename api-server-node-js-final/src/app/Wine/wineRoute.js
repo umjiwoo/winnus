@@ -36,4 +36,7 @@ module.exports = function(app){
 
     //상점 상세 조회 api
     app.get('/app/shops/:shopId',jwtMiddleware,wine.getShopDetail);
+
+    //상점 취급 와인 중 음식 페어링 와인 조회 api
+    app.get('/app/shops/:shopId/pairing/:foodId',jwtMiddleware,wine.getWineByFood);
 };
