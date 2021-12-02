@@ -124,10 +124,7 @@ exports.getWineByFood=async function(req,res){
     const userIdFromJWT=req.verifiedToken.userId;
     const shopId=req.params.shopId;
     const foodId=req.params.foodId;
-    if(!shopId)
-        return res.send(errResponse(baseResponse.ENTER_SHOP_ID_TO_SHOW));
-    if(!foodId)
-        return res.send(errResponse(baseResponse.ENTER_FOOD_ID_TO_SEARCH_WINE));
+
     const getWineByFoodRes=await wineProvider.retrieveWineByFood(userIdFromJWT, shopId, foodId);
     return res.send(getWineByFoodRes);
 };
