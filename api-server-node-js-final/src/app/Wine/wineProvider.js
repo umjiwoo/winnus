@@ -435,7 +435,7 @@ exports.retrieveShopDetail = async function (userId, shopId) {
     for (let i = 0; i < selectShopWines.length; i++) {
         shopWineIdList.push(selectShopWines[i].wineId);
     }
-    console.log(shopWineIdList);
+    console.log("상점 와인 인덱스 리스트",shopWineIdList);
 
 
     //해당 인덱스의 와인들 페어링 푸드 가져오기
@@ -444,4 +444,28 @@ exports.retrieveShopDetail = async function (userId, shopId) {
 
     connection.release();
     return response(baseResponse.SUCCESS, [{wineCount: selectShopWines.length}].concat({wineList: selectShopWines}).concat({pairingFoodList: selectFoodPairingList}));
+};
+
+exports.retrieveWineByFood=async function(userId,shopId,foodId){
+    const connection = await pool.getConnection(async (conn) => conn);
+    //상점 취급 와인 가져오기
+    const selectShopWineIds = await wineDao.selectShopWineId(connection, shopId);
+
+    if (selectShopWineIds.length < 1)
+        return errResponse(baseResponse.SHOP_WINE_NOT_EXIST);
+
+    const shopWineIdList = [];
+    for (let i = 0; i < selectShopWineIds.length; i++) {
+        shopWineIdList.push(selectShopWineIds[i].wineId);
+    }
+    console.log("상점 와인 인덱스 리스트",shopWineIdList);
+
+    const queryParams=[userId,foodId,shopWineIdList];
+
+    const pairingWineRes=await wineDao.selectPairingWine(connection,queryParams);
+
+    console.log(`${foodId}번 음식과 어울리는 와인\n`,pairingWineRes);
+
+    connection.release();
+    return response(baseResponse.SUCCESS,[{wineCount:pairingWineRes.length}].concat({pairingWineList:pairingWineRes}));
 };

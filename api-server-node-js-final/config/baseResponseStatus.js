@@ -65,6 +65,8 @@ module.exports = {
 
     ENTER_REVIEW_ID_TO_DELETE:{"isSuccess": false, "code": 2048, "message": "삭제할 리뷰 인덱스를 입력해주세요."},
 
+    ENTER_FOOD_ID_TO_SEARCH_WINE:{"isSuccess": false, "code": 2049, "message": "페어링할 음식 인덱스를 입력해주세요."},
+
     // Response error
     ALREADY_SIGN_UP:{"isSuccess": false, "code": 3001, "message":"이미 가입되어 있는 전화번호입니다."},
     NICKNAME_ALREADY_EXIST:{"isSuccess": false, "code": 3002, "message":"이미 사용중인 닉네임입니다."},
