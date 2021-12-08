@@ -25,17 +25,13 @@ exports.createUser = async function (nickname, phoneNum, pwd) {
     try {
         const connection = await pool.getConnection(async (conn) => conn);
 
-        //nickname,phoneNum 중복체크
+        //phoneNum 중복체크
         const phoneNumCheck = await userProvider.phoneNumCheck(phoneNum);
         if (phoneNumCheck.length > 0 && phoneNumCheck[0].status === "REGISTERED")
             return errResponse(baseResponse.ALREADY_SIGN_UP);
 
         if (phoneNumCheck.length > 0 && phoneNumCheck[0].status === "DELETED")
             return errResponse(baseResponse.WITHDRAWAL_ACCOUNT_PHONE_NUMBER);
-
-        const nicknameCheck = await userProvider.nicknameCheck(nickname);
-        if (nicknameCheck.length > 0)
-            return errResponse(baseResponse.NICKNAME_ALREADY_EXIST);
 
         //비밀번호 암호화
         const hashedPassword = await crypto
@@ -128,7 +124,7 @@ exports.postSignIn = async function (phoneNum, pwd) {
         const userCheck = await userProvider.phoneNumCheck(phoneNum);
         if (userCheck.length < 1)
             return errResponse(baseResponse.USER_NOT_EXIST);
-        if (userCheck[0].status === "WITHDRAWN")
+        if (userCheck[0].status === "DELETED")
             return errResponse(baseResponse.WITHDRAWAL_ACCOUNT);
 
         const hashedPassword = await crypto
