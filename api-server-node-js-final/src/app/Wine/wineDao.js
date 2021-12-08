@@ -128,7 +128,7 @@ exports.selectWineListByTaste = async function (connection, userId, type, sweetn
     return selectWineListByTasteQueryRow;
 };
 
-exports.selectWineInfo = async function (connection, wineId) {
+exports.selectWineInfo = async function (connection, userId, wineId) {
     const selectWineInfoQuery = `
         SELECT wineImg,
                wineName,
@@ -147,11 +147,16 @@ exports.selectWineInfo = async function (connection, wineId) {
                (select type from TypeCategory where typeId = Wine.type)              as type,
                variety,
                (select ROUND(avg(rating), 2) from Review where wineId = Wine.wineId) as rating,
-               (select count(reviewId) from Review where wineId = Wine.wineId)       as reviewNum
+               (select count(reviewId) from Review where wineId = Wine.wineId)       as reviewNum,
+               CASE
+                   WHEN (select status from Subscribe where wineId = Wine.wineId and userId = ?) = "Y"
+                       THEN "Y"
+                   ELSE "N"
+                   END AS userSubscribeStatus
         FROM Wine
         WHERE wineId = ?;
     `;
-    const [selectWineInfoQueryRow] = await connection.query(selectWineInfoQuery, wineId);
+    const [selectWineInfoQueryRow] = await connection.query(selectWineInfoQuery,[userId,wineId]);
     return selectWineInfoQueryRow;
 };
 

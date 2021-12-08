@@ -53,14 +53,14 @@ exports.retrieveTodayWineList = async function (userId) {
     return response(baseResponse.SUCCESS, {todayWines: wineRes});
 };
 
-exports.retrieveWineInfo = async function (wineId) {
+exports.retrieveWineInfo = async function (userId,wineId) {
     const connection = await pool.getConnection(async (conn) => conn);
 
     const wineStatusCheckRes = await wineDao.selectWineStatus(connection, wineId);
     if (wineStatusCheckRes.length < 1 || wineStatusCheckRes[0].status === "DELETED")
         return errResponse(baseResponse.WINE_NOT_EXIST);
 
-    const wineInfo = await wineDao.selectWineInfo(connection, wineId);
+    const wineInfo = await wineDao.selectWineInfo(connection,userId, wineId);
     const wineShopRes = await wineDao.selectWineShopByWineId(connection, wineId);
     const flavor = await wineDao.selectWineFlavor(connection, wineId);
     const pairingFood = await wineDao.selectPairingFood(connection, wineId);
@@ -346,6 +346,7 @@ exports.retrieveWinesByFilter = async function (userId, keyword, type, sweetness
     console.log("result\n", result);
     connection.release();
     return response(baseResponse.SUCCESS, [{filteringResCount: resultCount.length}].concat({filteringRes: result}));
+    //return response(baseResponse.SUCCESS, {filteringRes: result});
 };
 
 exports.retrieveWineAromaList = async function () {
