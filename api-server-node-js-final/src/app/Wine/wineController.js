@@ -21,10 +21,11 @@ exports.getWineList=async function(req,res){
 };
 
 exports.getWineInfo=async function(req,res){
+    const userIdFromJWT=req.verifiedToken.userId;
     const wineId=req.params.wineId;
     if(!wineId)
         return res.send(errResponse(baseResponse.WINE_ID_NULL));
-    const wineInfo=await wineProvider.retrieveWineInfo(wineId);
+    const wineInfo=await wineProvider.retrieveWineInfo(userIdFromJWT,wineId);
     return res.send(wineInfo);
 };
 
