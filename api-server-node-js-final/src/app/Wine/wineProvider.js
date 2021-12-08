@@ -32,7 +32,7 @@ exports.retrieveTodayWineList = async function (userId) {
 
     let queryParams=[userId];
     let wineIdList=[];
-    if(index.wineIdxList.length!=0) {
+    if(index.wineIdxList.length==6) {
         console.log("오늘의 와인 인덱스: ", index.wineIdxList);
         //해당 인덱스 와인(인덱스,이미지,이름,가격) 가져오기
         queryParams.push(index.wineIdxList);
@@ -328,7 +328,7 @@ exports.retrieveWinesByFilter = async function (userId, keyword, type, sweetness
 
     //const resultCount=await connection.
     //const [exec] = await connection.query(sql, queryParams);
-    const resultCount=await wineDao.selectWineByFiltering(connection,countSql,queryParams);
+    //const resultCount=await wineDao.selectWineByFiltering(connection,countSql,queryParams);
     const exec=await wineDao.selectWineByFiltering(connection,sql,queryParams);
 
     console.log("쿼리 결과\n", exec);
@@ -345,8 +345,8 @@ exports.retrieveWinesByFilter = async function (userId, keyword, type, sweetness
 
     console.log("result\n", result);
     connection.release();
-    return response(baseResponse.SUCCESS, [{filteringResCount: resultCount.length}].concat({filteringRes: result}));
-    //return response(baseResponse.SUCCESS, {filteringRes: result});
+    //return response(baseResponse.SUCCESS, [{filteringResCount: resultCount.length}].concat({filteringRes: result}));
+    return response(baseResponse.SUCCESS, {filteringRes: result});
 };
 
 exports.retrieveWineAromaList = async function () {
