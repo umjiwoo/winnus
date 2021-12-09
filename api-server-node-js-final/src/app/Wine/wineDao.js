@@ -514,7 +514,7 @@ exports.selectWineShopByAreaWineList = async function (connection, queryParams) 
         SELECT shopId, shopImg, shopName, shopCategory, location, tel
         FROM Shop
         WHERE location LIKE ?
-          AND shopId IN (select shopId from ShopWine where wineId in ?);
+          AND shopId IN (select shopId from ShopWine where wineId in (?));
     `;
     const [selectWineShopByAreaWineListQueryRow] = await connection.query(selectWineShopByAreaWineListQuery, queryParams);
     return selectWineShopByAreaWineListQueryRow;
