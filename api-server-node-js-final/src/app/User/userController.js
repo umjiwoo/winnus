@@ -120,10 +120,12 @@ exports.login=async function(req,res){
     return res.send(signInRes);
 };
 
+
 exports.autoLogin=async function(req,res){
     const userIdFromJWT=req.verifiedToken.userId;
     return res.send(response(baseResponse.TOKEN_VERIFICATION_SUCCESS,{loginUserId:userIdFromJWT}));
 };
+
 
 exports.postReview=async function(req,res){
     const userIdFromJWT=req.verifiedToken.userId;
@@ -139,6 +141,18 @@ exports.postReview=async function(req,res){
 
     const postReviewRes=await userService.createReview(wineId,userIdFromJWT,rating,content,tagList);
     return res.send(postReviewRes);
+};
+
+
+exports.postReport=async function(req,res){
+    const userIdFromJWT=req.verifiedToken.userId;
+    const {reviewId,reasonId}=req.body;
+    if(!reviewId)
+        return res.send(errResponse(baseResponse.ENTER_REPORT_REVIEW_ID));
+    if(!reasonId)
+        return res.send(errResponse(baseResponse.ENTER_REPORT_REASON_ID));
+    const postReportRes=await userService.createReport(userIdFromJWT,reviewId,reasonId);
+    return res.send(postReportRes);
 };
 
 exports.postSubscribe=async function(req,res){

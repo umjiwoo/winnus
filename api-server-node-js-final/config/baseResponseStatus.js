@@ -10,6 +10,7 @@ module.exports = {
     DELETE_ALL_SEARCHED_KEYWORD_SUCCESS:{"isSuccess": true, "code": 1006, "message":"검색 기록 전체 삭제 성공"},
     UPDATE_USER_INFO_SUCCESS:{"isSuccess": true, "code": 1007, "message":"사용자 정보 수정 성공"},
     USER_WITHDRAW_SUCCESS:{"isSuccess": true, "code": 1008, "message":"사용자 탈퇴 성공"},
+    REPORT_SUCCESS:{"isSuccess": true, "code": 1009, "message":"리뷰 신고가 접수되었습니다. 검토 후 문제 사항이 확인될 시 삭제 조치하겠습니다."},
 
     // Common
     TOKEN_EMPTY : { "isSuccess": false, "code": 2000, "message":"JWT 토큰을 입력해주세요." },
@@ -65,6 +66,9 @@ module.exports = {
 
     ENTER_REVIEW_ID_TO_DELETE:{"isSuccess": false, "code": 2048, "message": "삭제할 리뷰 인덱스를 입력해주세요."},
 
+    ENTER_REPORT_REVIEW_ID:{"isSuccess": false, "code": 2049, "message": "신고할 리뷰 인덱스를 입력해주세요."},
+    ENTER_REPORT_REASON_ID:{"isSuccess": false, "code": 2050, "message": "신고하고자 하는 사유 인덱스를 입력해주세요."},
+
     // Response error
     ALREADY_SIGN_UP:{"isSuccess": false, "code": 3001, "message":"이미 가입되어 있는 전화번호입니다."},
     NICKNAME_ALREADY_EXIST:{"isSuccess": false, "code": 3002, "message":"이미 사용중인 닉네임입니다."},
@@ -106,7 +110,9 @@ module.exports = {
 
     ALREADY_WITHDRAWN_USER:{"isSuccess": false, "code": 3055, "message": "이미 탈퇴한 회원입니다."},
 
-    ALREADY_DELETED_REVIEW:{"isSuccess": false, "code": 3056, "message": "이미 삭제된 리뷰 인덱스 입니다."},
+    LOGIN_USER_REVIEW:{"isSuccess": false, "code": 3056, "message": "로그인 유저가 작성한 리뷰입니다. 마이 리뷰 확인 후 수정/삭제해주세요."},
+    ALREADY_DELETED_REVIEW:{"isSuccess": false, "code": 3057, "message": "이미 삭제된 리뷰 인덱스 입니다."},
+    ALREADY_REPORTED_REVIEW:{"isSuccess": false, "code": 3058, "message": "이미 신고한 리뷰 인덱스 입니다. 검토 중에 있으니 잠시만 기다려주세요."},
 
     //Connection, Transaction 등의 서버 오류
     DB_ERROR : { "isSuccess": false, "code": 4000, "message": "데이터 베이스 에러"},

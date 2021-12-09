@@ -279,6 +279,16 @@ exports.selectReviewUserCheck = async function (connection, userId, reviewId) {
     return selectReviewUserCheckQueryRow;
 };
 
+exports.selectReviewStatus = async function(connection,reviewId){
+    const selectReviewStatusQuery=`
+        SELECT userId,status
+        FROM Review
+        WHERE reviewId=?;
+    `;
+    const [selectReviewStatusQueryRow]=await connection.query(selectReviewStatusQuery,reviewId);
+    return selectReviewStatusQueryRow;
+};
+
 exports.updateUserReview = async function (connection, reviewUpdateArgs) {
     const updateUserReviewQuery = `
         UPDATE Review
@@ -340,4 +350,22 @@ exports.updateUserStatus = async function (connection, userId, reasonId) {
     `;
     const updateUserStatusQueryRow = await connection.query(updateUserStatusQuery, [reasonId, userId]);
     return updateUserStatusQueryRow;
+};
+
+exports.insertReviewReport=async function(connection,userId,reviewId,reasonId){
+    const insertReviewReportQuery=`
+        INSERT INTO ReviewReport (userId,reviewId,reasonId) VALUE (?,?,?);
+    `;
+    const insertReviewReportQueryRow=await connection.query(insertReviewReportQuery,[userId,reviewId,reasonId]);
+    return insertReviewReportQueryRow;
+};
+
+exports.selectReviewReport=async function(connection,userId,reviewId){
+    const selectReviewReportQuery=`
+        SELECT status
+        FROM ReviewReport
+        WHERE userId=? AND reviewId=?;
+    `;
+    const [selectReviewReportQueryRow]=await connection.query(selectReviewReportQuery,[userId,reviewId]);
+    return selectReviewReportQueryRow;
 };

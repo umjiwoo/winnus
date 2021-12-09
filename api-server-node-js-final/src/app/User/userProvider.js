@@ -100,3 +100,17 @@ exports.retrieveUserReviews=async function(userId){
     connection.release();
     return response(baseResponse.SUCCESS,[{reviewNum:userReviews.length}].concat({userReviews:userReviews}));
 };
+
+exports.reviewStatusCheck = async function(reviewId){
+    const connection = await pool.getConnection(async (conn) => conn);
+    const reviewStatusCheckRes=await userDao.selectReviewStatus(connection,reviewId);
+    connection.release();
+    return reviewStatusCheckRes;
+};
+
+exports.reviewReportCheck=async function(userId,reviewId){
+    const connection = await pool.getConnection(async (conn) => conn);
+    const reviewReportCheck=await userDao.selectReviewReport(connection,userId,reviewId);
+    connection.release();
+    return reviewReportCheck;
+};

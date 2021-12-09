@@ -36,6 +36,8 @@ module.exports = function(app){
     app.patch("/app/users/reviews/:reviewId",jwtMiddleware,user.updateReviewStatus);
     //리뷰 수정 api
     app.patch('/app/reviews/:reviewId',jwtMiddleware,user.updateReview);
+    //리뷰 신고 api
+    app.post('/app/reviews/report',jwtMiddleware,user.postReport);
 
 
     //와인 찜 등록 api
