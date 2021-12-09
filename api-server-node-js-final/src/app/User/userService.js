@@ -12,12 +12,13 @@ const {errResponse} = require("../../../config/response");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const {connect} = require("http2");
+const {insertKeyword} = require("./userDao");
 
 const accountSid = secret_config.TWILIO_ACCOUNT_SID;
 const authToken = secret_config.TWILIO_AUTH_TOKEN;
 const client = require('twilio')(accountSid, authToken);
 
-global.verifyDict={};
+global.verifyDict = {};
 
 // Service: Create, Update, Delete 비즈니스 로직 처리
 
@@ -52,8 +53,8 @@ exports.createUser = async function (nickname, phoneNum, pwd) {
 exports.createVerification = async function (phoneNum) {
     try {
         const randomVerificationNum = Math.floor(Math.random() * 9000) + 1000; //0000~9999사이의 랜덤값 생성
-        verifyDict[phoneNum]=randomVerificationNum;
-        console.log("verifyDict",verifyDict);
+        verifyDict[phoneNum] = randomVerificationNum;
+        console.log("verifyDict", verifyDict);
 
         client.messages
             .create({
@@ -72,18 +73,16 @@ exports.createVerification = async function (phoneNum) {
 
 exports.postVerification = async function (phoneNum, verifyNum) {
     try {
-        if(phoneNum in verifyDict){
-            if(verifyDict[phoneNum]==verifyNum){
+        if (phoneNum in verifyDict) {
+            if (verifyDict[phoneNum] == verifyNum) {
                 delete verifyDict[phoneNum];
-                console.log("verifyDict",verifyDict);
+                console.log("verifyDict", verifyDict);
                 return response(baseResponse.VERIFY_SUCCESS);
-            }
-            else{
-                console.log("verifyDict",verifyDict);
+            } else {
+                console.log("verifyDict", verifyDict);
                 return errResponse(baseResponse.VERIFY_FAIL);
             }
-        }
-        else{
+        } else {
             return errResponse(baseResponse.REQUEST_VERIFY_NUM_FIRST);
         }
     } catch (err) {
@@ -191,6 +190,30 @@ exports.createReview = async function (wineId, userId, rating, content, tagList)
         connection.release();
     }
 };
+
+
+exports.createReport = async function (userId, reviewId, reasonId) {
+    try {
+        const connection = await pool.getConnection(async (conn) => conn);
+
+        const reviewCheck = await userProvider.reviewStatusCheck(reviewId);
+        if(reviewCheck[0].userId===userId)
+            return errResponse(baseResponse.LOGIN_USER_REVIEW);
+        if (reviewCheck[0].status === "DELETED")
+            return errResponse(baseResponse.ALREADY_DELETED_REVIEW);
+
+        const reviewReportCheck = await userProvider.reviewReportCheck(userId, reviewId);
+        if (reviewReportCheck.length > 0 && reviewReportCheck[0].status === "ACCEPTED")
+            return errResponse(baseResponse.ALREADY_REPORTED_REVIEW);
+
+        const createReportRes = await userDao.insertReviewReport(connection, userId, reviewId, reasonId);
+        return response(baseResponse.REPORT_SUCCESS);
+    } catch (err) {
+        logger.error(`App - postReviewReport Service error\n: ${err.message} \n${JSON.stringify(err)}`);
+        return errResponse(baseResponse.DB_ERROR);
+    }
+};
+
 
 exports.createSubscribe = async function (userId, wineId) {
     try {
@@ -397,9 +420,9 @@ exports.updateReview = async function (userIdFromJWT, reviewId, rating, content,
     }
 };
 
-exports.updateReviewStatus=async function(userId,reviewId){
+exports.updateReviewStatus = async function (userId, reviewId) {
     const connection = await pool.getConnection(async (conn) => conn);
-    try{
+    try {
         await connection.beginTransaction();
         const reviewUserCheck = await userDao.selectReviewUserCheck(connection, userId, reviewId);
         if (reviewUserCheck.length < 1)
@@ -407,16 +430,14 @@ exports.updateReviewStatus=async function(userId,reviewId){
         if (reviewUserCheck[0].status === "DELETED")
             return errResponse(baseResponse.ALREADY_DELETED_REVIEW);
 
-        const updateReviewStatus=await userDao.updateReviewStatus(connection,reviewId);
+        const updateReviewStatus = await userDao.updateReviewStatus(connection, reviewId);
         await connection.commit();
         return response(baseResponse.SUCCESS);
-    }
-    catch(err){
+    } catch (err) {
         logger.error(`App - updateReviewStatus Service error\n: ${err.message}`);
         await connection.rollback();
         return errResponse(baseResponse.DB_ERROR);
-    }
-    finally {
+    } finally {
         connection.release();
     }
 };
