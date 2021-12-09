@@ -456,6 +456,18 @@ exports.selectCountWineShop = async function (connection, queryParams) {
     return selectCountWineShopQueryRow;
 };
 
+exports.selectCountWineShopIncludingSearchWine=async function(connection, wineCheck){
+    const selectCountWineShopIncludingSearchWineQuery=`
+        SELECT count(shopId) as shopNum
+        FROM Shop
+        WHERE shopId IN (select shopId from ShopWine where wineId in (?));
+    `;
+    console.log(wineCheck);
+    console.log(selectCountWineShopIncludingSearchWineQuery);
+    const [selectCountWineShopIncludingSearchWineQueryRow]=await connection.query(selectCountWineShopIncludingSearchWineQuery,[wineCheck]);
+    return selectCountWineShopIncludingSearchWineQueryRow;
+};
+
 exports.selectAllWineShop = async function (connection) {
     const selectWineShopQuery = `
         SELECT shopId, shopImg, shopName, shopCategory, location, tel
@@ -504,6 +516,16 @@ exports.selectWineShopByAreaWineList = async function (connection, queryParams) 
     `;
     const [selectWineShopByAreaWineListQueryRow] = await connection.query(selectWineShopByAreaWineListQuery, queryParams);
     return selectWineShopByAreaWineListQueryRow;
+};
+
+exports.selectWineShopIncludingSearchWine=async function(connection, wineCheck){
+    const selectWineShopIncludingSearchWineQuery=`
+        SELECT shopId, shopImg, shopName, shopCategory, location, tel
+            FROM Shop
+            WHERE shopId IN (select shopId from ShopWine where wineId in (?));
+    `;
+    const [selectWineShopIncludingSearchWineQueryRow]=await connection.query(selectWineShopIncludingSearchWineQuery,[wineCheck]);
+    return selectWineShopIncludingSearchWineQueryRow;
 };
 
 exports.selectWineShop = async function (connection, shopId) {
