@@ -403,16 +403,29 @@ exports.retrieveWineShop = async function (wineName, area) {
         wineCheck[i] = wineCheck[i].wineId;
     }
     console.log(wineCheck);
-    const queryParams = [area, wineCheck];
-    console.log(queryParams);
-    const wineShopCount = await wineDao.selectCountWineShop(connection, queryParams);
+    console.log(area);
 
-    const retrieveWineShopRes = await wineDao.selectWineShopByAreaWineList(connection, queryParams);
-    if (retrieveWineShopRes.length < 1)
-        errResponse(baseResponse.WINE_SHOP_NOT_EXIST_INCLUDING_THIS_WINE);
+    if(area=='%전체%'){
+        console.log("전체 상점 검색 진입");
+        const wineShopCount = await wineDao.selectCountWineShopIncludingSearchWine(connection, wineCheck);
+        const retrieveWineShopRes = await wineDao.selectWineShopIncludingSearchWine(connection, wineCheck);
+        if (retrieveWineShopRes.length < 1)
+            errResponse(baseResponse.WINE_SHOP_NOT_EXIST_INCLUDING_THIS_WINE);
 
-    connection.release();
-    return response(baseResponse.SUCCESS, [{wineShopCount: wineShopCount[0].shopNum}].concat({shopList: retrieveWineShopRes}));
+        connection.release();
+        return response(baseResponse.SUCCESS, [{wineShopCount: wineShopCount[0].shopNum}].concat({shopList: retrieveWineShopRes}));
+    }
+    else {
+        const queryParams = [area, wineCheck];
+        console.log(queryParams);
+        const wineShopCount = await wineDao.selectCountWineShop(connection, queryParams);
+        const retrieveWineShopRes = await wineDao.selectWineShopByAreaWineList(connection, queryParams);
+        if (retrieveWineShopRes.length < 1)
+            errResponse(baseResponse.WINE_SHOP_NOT_EXIST_INCLUDING_THIS_WINE);
+
+        connection.release();
+        return response(baseResponse.SUCCESS, [{wineShopCount: wineShopCount[0].shopNum}].concat({shopList: retrieveWineShopRes}));
+    }
 };
 
 exports.retrieveShopDetail = async function (userId, shopId) {
