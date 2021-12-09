@@ -6,6 +6,7 @@ module.exports = function(app){
 
     //실시간 인기 와인 리스트 가져오기 api-query string
     app.get('/app/wines/hot',jwtMiddleware,wine.getWineList);
+
     //오늘의 와인 리스트 가져오기 api
     app.get('/app/wines/today',jwtMiddleware,wine.getTodayWineList);
 
@@ -14,10 +15,6 @@ module.exports = function(app){
 
     //필터 검색 api
     app.get('/app/wines/filter',jwtMiddleware,wine.getWineListByFilter);
-
-    //필터 검색을 위한 향,음식 리스트 내보내주기
-    app.get('/app/aromas',wine.getAromaList);
-    app.get('/app/foods',wine.getFoodList);
 
     //와인 상세 페이지 api
     app.get('/app/wines/:wineId',jwtMiddleware,wine.getWineInfo);
@@ -39,4 +36,7 @@ module.exports = function(app){
 
     //상점 취급 와인 중 음식 페어링 와인 조회 api
     app.get('/app/shops/:shopId/pairing/:foodId',jwtMiddleware,wine.getWineByFood);
+
+    //와인 클릭 시 clickCount 증가시키기
+    //app.patch('/app/wines/:wineId/clickCount',jwtMiddleware,wine.updateClickCount);
 };

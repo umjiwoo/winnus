@@ -143,8 +143,8 @@ exports.selectWineInfo = async function (connection, userId, wineId) {
                body,
                tannin,
                taste,
-               Wine.type                                                             as typeId,
-               (select type from TypeCategory where typeId = Wine.type)              as type,
+               Wine.type as typeId,
+               (select type from TypeCategory where typeId = Wine.type) as type,
                variety,
                (select ROUND(avg(rating), 2) from Review where wineId = Wine.wineId) as rating,
                (select count(reviewId) from Review where wineId = Wine.wineId)       as reviewNum,
@@ -237,8 +237,9 @@ exports.selectBestWineListByType = async function (connection, wineType, wineId)
         SELECT wineId, wineImg, wineName, price, country, region
         FROM Wine
         WHERE type = ?
-                  NOT IN (?)
-        ORDER BY clickCount LIMIT 4;
+          AND wineId!=?
+        ORDER BY clickCount
+        LIMIT 4;
     `;
     const [selectBestWineListByTypeQueryRow] = await connection.query(selectBestWineListByTypeQuery, [wineType, wineId]);
     return selectBestWineListByTypeQueryRow;
@@ -252,7 +253,7 @@ exports.selectSimilarWineList = async function (connection, sweetness, acidity, 
           AND acidity = ?
           AND body = ?
           AND tannin = ?)
-        NOT IN (?)
+          AND wineId!=?
         LIMIT 4;
     `;
     const [selectSimilarWineListQueryRow] = await connection.query(selectSimilarWineListQuery, [sweetness, acidity, body, tannin, wineId]);
@@ -422,23 +423,6 @@ exports.selectWineByName = async function (connection, userId, keyword) {
     return selectWineByNameQueryRow;
 };
 
-exports.selectWineAromas = async function (connection) {
-    const selectWineAromasQuery = `
-        SELECT subCategoryId, flavor
-        FROM SubFlavorCategory;
-    `;
-    const [selectWineAromasQueryRow] = await connection.query(selectWineAromasQuery);
-    return selectWineAromasQueryRow;
-};
-
-exports.selectWineFoods = async function (connection) {
-    const selectWineFoodsQuery = `
-        SELECT foodCategoryId, food
-        FROM FoodCategory;
-    `;
-    const [selectWineFoodsQueryRow] = await connection.query(selectWineFoodsQuery);
-    return selectWineFoodsQueryRow;
-};
 
 exports.selectCountAllWineShop = async function (connection) {
     const selectCountWineShopQuery = `
