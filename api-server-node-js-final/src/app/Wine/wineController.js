@@ -82,17 +82,6 @@ exports.getWineListByFilter=async function(req,res){
     return res.send(getWineListByFilterRes);
 };
 
-
-exports.getAromaList=async function(req,res){
-    const getAromaListRes=await wineProvider.retrieveWineAromaList();
-    return res.send(getAromaListRes);
-};
-
-exports.getFoodList=async function(req,res){
-    const getFoodListRes=await wineProvider.retrieveWineFoodList();
-    return res.send(getFoodListRes);
-};
-
 exports.getShops=async function(req,res){
     const {wineName,area}=req.query;
     let getShopRes;
@@ -129,3 +118,7 @@ exports.getWineByFood=async function(req,res){
     const getWineByFoodRes=await wineProvider.retrieveWineByFood(userIdFromJWT, shopId, foodId);
     return res.send(getWineByFoodRes);
 };
+
+// exports.updateClickCount=async function(req,res){
+//
+// };

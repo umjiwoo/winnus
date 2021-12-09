@@ -1,6 +1,7 @@
 const {pool} = require("../../../config/database");
 const {logger} = require("../../../config/winston");
 const index=require("../../../index");
+const schedule = require('node-schedule');
 
 const wineDao = require("./wineDao");
 
@@ -8,6 +9,19 @@ const {response, errResponse} = require("../../../config/response");
 const baseResponse = require("../../../config/baseResponseStatus");
 const {integer} = require("twilio/lib/base/deserialize");
 const {query} = require("winston");
+
+global.wineIdxList=[];
+const job = schedule.scheduleJob('47 14 * * *', function () {
+//와인 인덱스값 내에서 랜덤하게 번호 추출-6개
+    while (wineIdxList.length < 6) {
+        const randomNum = Math.floor(Math.random() * 1008) + 1;
+        if (!wineIdxList.includes(randomNum))
+            wineIdxList.push(randomNum);
+    }
+    const today=new Date();
+    console.log(`${today.getFullYear()}/${today.getMonth()+1}/${today.getDate()} 오늘의 와인 인덱스 `,wineIdxList);
+});
+
 
 
 // Provider: Read 비즈니스 로직 처리
@@ -32,10 +46,10 @@ exports.retrieveTodayWineList = async function (userId) {
 
     let queryParams=[userId];
     let wineIdList=[];
-    if(index.wineIdxList.length==6) {
-        console.log("오늘의 와인 인덱스: ", index.wineIdxList);
+    if(wineIdxList.length===6) {
+        console.log("오늘의 와인 인덱스: ", wineIdxList);
         //해당 인덱스 와인(인덱스,이미지,이름,가격) 가져오기
-        queryParams.push(index.wineIdxList);
+        queryParams.push(wineIdxList);
     }
     else{
         while (wineIdList.length < 6) {
@@ -350,17 +364,6 @@ exports.retrieveWinesByFilter = async function (userId, keyword, type, sweetness
     return response(baseResponse.SUCCESS, {filteringRes: result});
 };
 
-exports.retrieveWineAromaList = async function () {
-    const connection = await pool.getConnection(async (conn) => conn);
-    const retrieveWineAromaListRes = await wineDao.selectWineAromas(connection);
-    return response(baseResponse.SUCCESS, retrieveWineAromaListRes);
-};
-
-exports.retrieveWineFoodList = async function () {
-    const connection = await pool.getConnection(async (conn) => conn);
-    const retrieveWineFoodListRes = await wineDao.selectWineFoods(connection);
-    return response(baseResponse.SUCCESS, retrieveWineFoodListRes);
-};
 
 exports.retrieveAllWineShop = async function () {
     const connection = await pool.getConnection(async (conn) => conn);
