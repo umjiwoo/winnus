@@ -1,6 +1,6 @@
 const {pool} = require("../../../config/database");
 const {logger} = require("../../../config/winston");
-const index=require("../../../index");
+const index = require("../../../index");
 const schedule = require('node-schedule');
 
 const wineDao = require("./wineDao");
@@ -10,7 +10,7 @@ const baseResponse = require("../../../config/baseResponseStatus");
 const {integer} = require("twilio/lib/base/deserialize");
 const {query} = require("winston");
 
-global.wineIdxList=[];
+global.wineIdxList = [];
 const job = schedule.scheduleJob('0 0 * * *', function () {
 //와인 인덱스값 내에서 랜덤하게 번호 추출-6개
     while (wineIdxList.length < 6) {
@@ -18,10 +18,9 @@ const job = schedule.scheduleJob('0 0 * * *', function () {
         if (!wineIdxList.includes(randomNum))
             wineIdxList.push(randomNum);
     }
-    const today=new Date();
-    console.log(`${today.getFullYear()}/${today.getMonth()+1}/${today.getDate()} 오늘의 와인 인덱스 `,wineIdxList);
+    const today = new Date();
+    console.log(`${today.getFullYear()}/${today.getMonth() + 1}/${today.getDate()} 오늘의 와인 인덱스 `, wineIdxList);
 });
-
 
 
 // Provider: Read 비즈니스 로직 처리
@@ -44,33 +43,32 @@ exports.retrieveWineListByType = async function (userId, type) {
 exports.retrieveTodayWineList = async function (userId) {
     const connection = await pool.getConnection(async (conn) => conn);
 
-    let queryParams=[userId];
-    let wineIdList=[];
-    if(wineIdxList.length===6) {
+    let queryParams = [userId];
+    let wineIdList = [];
+    if (wineIdxList.length === 6) {
         console.log("오늘의 와인 인덱스: ", wineIdxList);
         //해당 인덱스 와인(인덱스,이미지,이름,가격) 가져오기
         queryParams.push(wineIdxList);
-    }
-    else{
-        wineIdList=[1,2,3,4,5,6]
+    } else {
+        wineIdList = [1, 2, 3, 4, 5, 6]
         queryParams.push(wineIdList);
     }
     console.log(queryParams);
 
-    const wineRes=await wineDao.selectTodayWineInfo(connection,queryParams);
+    const wineRes = await wineDao.selectTodayWineInfo(connection, queryParams);
     console.log("오늘의 와인 조회 결과", wineRes);
     connection.release();
     return response(baseResponse.SUCCESS, {todayWines: wineRes});
 };
 
-exports.retrieveWineInfo = async function (userId,wineId) {
+exports.retrieveWineInfo = async function (userId, wineId) {
     const connection = await pool.getConnection(async (conn) => conn);
 
     const wineStatusCheckRes = await wineDao.selectWineStatus(connection, wineId);
     if (wineStatusCheckRes.length < 1 || wineStatusCheckRes[0].status === "DELETED")
         return errResponse(baseResponse.WINE_NOT_EXIST);
 
-    const wineInfo = await wineDao.selectWineInfo(connection,userId, wineId);
+    const wineInfo = await wineDao.selectWineInfo(connection, userId, wineId);
     const wineShopRes = await wineDao.selectWineShopByWineId(connection, wineId);
     const flavor = await wineDao.selectWineFlavor(connection, wineId);
     const pairingFood = await wineDao.selectPairingFood(connection, wineId);
@@ -186,7 +184,7 @@ exports.retrieveWineByName = async function (userId, keyword) {
     return response(baseResponse.SUCCESS, [{wineCount: getWineNum}].concat({retrieveWineRes: retrieveWineRes}));
 };
 
-exports.retrieveWinesByFilter = async function (userId, keyword, type, sweetness, acidity, body, tannin, flavors, foods, price, page,orderBy) {
+exports.retrieveWinesByFilter = async function (userId, keyword, type, sweetness, acidity, body, tannin, flavors, foods, price, page, orderBy) {
     const connection = await pool.getConnection(async (conn) => conn);
 
     let typeList = [];
@@ -322,12 +320,12 @@ exports.retrieveWinesByFilter = async function (userId, keyword, type, sweetness
 
     sql += whereClause;
 
-    let countSql=sql+";";
+    let countSql = sql + ";";
 
-    if(orderBy=="high")
-        sql+=" order by w.price desc";
-    else if(orderBy=="low")
-        sql+=" order by w.price";
+    if (orderBy == "high")
+        sql += " order by w.price desc";
+    else if (orderBy == "low")
+        sql += " order by w.price";
 
 
     sql += " limit 10 offset ";
@@ -340,7 +338,7 @@ exports.retrieveWinesByFilter = async function (userId, keyword, type, sweetness
     //const resultCount=await connection.
     //const [exec] = await connection.query(sql, queryParams);
     //const resultCount=await wineDao.selectWineByFiltering(connection,countSql,queryParams);
-    const exec=await wineDao.selectWineByFiltering(connection,sql,queryParams);
+    const exec = await wineDao.selectWineByFiltering(connection, sql, queryParams);
 
     console.log("쿼리 결과\n", exec);
 
@@ -381,6 +379,38 @@ exports.retrieveWineShopByArea = async function (area) {
     return response(baseResponse.SUCCESS, [{wineShopCount: wineShopCount[0].shopNum}].concat({shopList: retrieveWineShopListByArea}));
 };
 
+exports.retrieveWineShopByWineName = async function (wineName) {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    //와인 진짜 있는 와인인지,와인 인덱스 알아오기
+    const nameSplitList = wineName.split("");
+    const repeatNum = nameSplitList.length;
+
+    for (let i = 0; i < repeatNum; i++) {
+        nameSplitList.splice(i * 2, 0, "%");
+    }
+    nameSplitList.push("%");
+    wineName = nameSplitList.join("");
+
+    const wineCheck = await wineDao.selectWineIdByName(connection, wineName);
+    if (wineCheck.length < 1)
+        return errResponse(baseResponse.WINE_SEARCH_BY_NAME_NOT_EXIST);
+
+    for (let i = 0; i < wineCheck.length; i++) {
+        wineCheck[i] = wineCheck[i].wineId;
+    }
+
+    console.log(wineCheck);
+
+    const wineShopCount = await wineDao.selectCountWineShopIncludingSearchWine(connection, wineCheck);
+    const retrieveWineShopRes = await wineDao.selectWineShopIncludingSearchWine(connection, wineCheck);
+    if (retrieveWineShopRes.length < 1)
+        errResponse(baseResponse.WINE_SHOP_NOT_EXIST_INCLUDING_THIS_WINE);
+
+    connection.release();
+    return response(baseResponse.SUCCESS, [{wineShopCount: wineShopCount[0].shopNum}].concat({shopList: retrieveWineShopRes}));
+};
+
 exports.retrieveWineShop = async function (wineName, area) {
     const connection = await pool.getConnection(async (conn) => conn);
 
@@ -402,30 +432,16 @@ exports.retrieveWineShop = async function (wineName, area) {
     for (let i = 0; i < wineCheck.length; i++) {
         wineCheck[i] = wineCheck[i].wineId;
     }
-    console.log(wineCheck);
-    console.log(area);
 
-    if(area=='%전체%'){
-        console.log("전체 상점 검색 진입");
-        const wineShopCount = await wineDao.selectCountWineShopIncludingSearchWine(connection, wineCheck);
-        const retrieveWineShopRes = await wineDao.selectWineShopIncludingSearchWine(connection, wineCheck);
-        if (retrieveWineShopRes.length < 1)
-            errResponse(baseResponse.WINE_SHOP_NOT_EXIST_INCLUDING_THIS_WINE);
+    const queryParams = [area, wineCheck];
+    console.log(queryParams);
+    const wineShopCount = await wineDao.selectCountWineShop(connection, queryParams);
+    const retrieveWineShopRes = await wineDao.selectWineShopByAreaWineList(connection, queryParams);
+    if (retrieveWineShopRes.length < 1)
+        errResponse(baseResponse.WINE_SHOP_NOT_EXIST_INCLUDING_THIS_WINE);
 
-        connection.release();
-        return response(baseResponse.SUCCESS, [{wineShopCount: wineShopCount[0].shopNum}].concat({shopList: retrieveWineShopRes}));
-    }
-    else {
-        const queryParams = [area, wineCheck];
-        console.log(queryParams);
-        const wineShopCount = await wineDao.selectCountWineShop(connection, queryParams);
-        const retrieveWineShopRes = await wineDao.selectWineShopByAreaWineList(connection, queryParams);
-        if (retrieveWineShopRes.length < 1)
-            errResponse(baseResponse.WINE_SHOP_NOT_EXIST_INCLUDING_THIS_WINE);
-
-        connection.release();
-        return response(baseResponse.SUCCESS, [{wineShopCount: wineShopCount[0].shopNum}].concat({shopList: retrieveWineShopRes}));
-    }
+    connection.release();
+    return response(baseResponse.SUCCESS, [{wineShopCount: wineShopCount[0].shopNum}].concat({shopList: retrieveWineShopRes}));
 };
 
 exports.retrieveShopDetail = async function (userId, shopId) {
@@ -456,7 +472,7 @@ exports.retrieveShopDetail = async function (userId, shopId) {
     return response(baseResponse.SUCCESS, [{wineCount: selectShopWines.length}].concat({wineList: selectShopWines}).concat({pairingFoodList: selectFoodPairingList}));
 };
 
-exports.retrieveWineByFood=async function(userId,shopId,foodId){
+exports.retrieveWineByFood = async function (userId, shopId, foodId) {
     const connection = await pool.getConnection(async (conn) => conn);
     //상점 취급 와인 가져오기
     const selectShopWineIds = await wineDao.selectShopWineId(connection, shopId);
@@ -468,14 +484,14 @@ exports.retrieveWineByFood=async function(userId,shopId,foodId){
     for (let i = 0; i < selectShopWineIds.length; i++) {
         shopWineIdList.push(selectShopWineIds[i].wineId);
     }
-    console.log("상점 와인 인덱스 리스트",shopWineIdList);
+    console.log("상점 와인 인덱스 리스트", shopWineIdList);
 
-    const queryParams=[userId,foodId,shopWineIdList];
+    const queryParams = [userId, foodId, shopWineIdList];
 
-    const pairingWineRes=await wineDao.selectPairingWine(connection,queryParams);
+    const pairingWineRes = await wineDao.selectPairingWine(connection, queryParams);
 
-    console.log(`음식 페어링 와인 조회 성공-${foodId}번 음식과 어울리는 와인\n`,pairingWineRes);
+    console.log(`음식 페어링 와인 조회 성공-${foodId}번 음식과 어울리는 와인\n`, pairingWineRes);
 
     connection.release();
-    return response(baseResponse.SUCCESS,[{wineCount:pairingWineRes.length}].concat({pairingWineList:pairingWineRes}));
+    return response(baseResponse.SUCCESS, [{wineCount: pairingWineRes.length}].concat({pairingWineList: pairingWineRes}));
 };

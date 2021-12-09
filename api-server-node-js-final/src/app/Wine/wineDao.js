@@ -462,8 +462,6 @@ exports.selectCountWineShopIncludingSearchWine=async function(connection, wineCh
         FROM Shop
         WHERE shopId IN (select shopId from ShopWine where wineId in (?));
     `;
-    console.log(wineCheck);
-    console.log(selectCountWineShopIncludingSearchWineQuery);
     const [selectCountWineShopIncludingSearchWineQueryRow]=await connection.query(selectCountWineShopIncludingSearchWineQuery,[wineCheck]);
     return selectCountWineShopIncludingSearchWineQueryRow;
 };

@@ -92,7 +92,7 @@ exports.getShops=async function(req,res){
         getShopRes=await wineProvider.retrieveWineShopByArea(area);
     }
     else if(!area){
-        return res.send(errResponse(baseResponse.GOTO_WINE_SEARCH));
+        getShopRes=await wineProvider.retrieveWineShopByWineName(wineName);
     }
     else{
         getShopRes=await wineProvider.retrieveWineShop(wineName,area);
