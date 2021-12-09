@@ -11,7 +11,7 @@ const {integer} = require("twilio/lib/base/deserialize");
 const {query} = require("winston");
 
 global.wineIdxList=[];
-const job = schedule.scheduleJob('47 14 * * *', function () {
+const job = schedule.scheduleJob('0 0 * * *', function () {
 //와인 인덱스값 내에서 랜덤하게 번호 추출-6개
     while (wineIdxList.length < 6) {
         const randomNum = Math.floor(Math.random() * 1008) + 1;
@@ -52,11 +52,7 @@ exports.retrieveTodayWineList = async function (userId) {
         queryParams.push(wineIdxList);
     }
     else{
-        while (wineIdList.length < 6) {
-            const randomNum = Math.floor(Math.random() * 1008) + 1;
-            if (!wineIdList.includes(randomNum))
-                wineIdList.push(randomNum);
-        }
+        wineIdList=[1,2,3,4,5,6]
         queryParams.push(wineIdList);
     }
     console.log(queryParams);
