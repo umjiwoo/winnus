@@ -1,7 +1,8 @@
 const express = require('./config/express');
 const {logger} = require('./config/winston');
-const schedule = require('node-schedule');
 
+
+//const schedule = require('node-schedule');
 // exports.wineIdxList=[];
 // const job = schedule.scheduleJob('41 14 * * *', function () {
 // //와인 인덱스값 내에서 랜덤하게 번호 추출-6개
