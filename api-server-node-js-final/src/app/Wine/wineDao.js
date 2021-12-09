@@ -219,7 +219,9 @@ exports.selectPairingWine=async function(connection,queryParams){
 
 exports.selectWineReviewLimit3 = async function (connection, wineId) {
     const selectWineReviewLimit3Query = `
-        SELECT rating,
+        SELECT 
+               reviewId,
+               rating,
                content,
                (select DATE_FORMAT(createdAt, '%Y.%m.%d'))              as createdAt,
                (select nickname from User where userId = Review.userId) as userName
