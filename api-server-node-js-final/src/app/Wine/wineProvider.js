@@ -291,7 +291,8 @@ exports.retrieveWinesByFilter = async function (userId, keyword, type, sweetness
     }
 
     if (foods) {
-        whereClause += " (fp.foodCategoryId in (?) and fp.wineId=w.wineId)";
+        whereClause += " (fp.foodCategoryId in (select foodCategoryId from FoodCategory where majorCategoryId in (?)) and fp.wineId=w.wineId)";
+        //whereClause += " (fp.foodCategoryId in (?) and fp.wineId=w.wineId)";
         whereClause += " and";
         queryParams.push(foodList);
     }
@@ -397,9 +398,6 @@ exports.retrieveWineShop = async function (wineName, area) {
     const wineCheck = await wineDao.selectWineIdByName(connection, wineName);
     if (wineCheck.length < 1)
         return errResponse(baseResponse.WINE_SEARCH_BY_NAME_NOT_EXIST);
-
-    console.log(wineCheck);
-    //const wineId=wineCheck[0].wineId;
 
     area = "%" + area + "%";
     for (let i = 0; i < wineCheck.length; i++) {
